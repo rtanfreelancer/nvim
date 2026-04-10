@@ -59,9 +59,6 @@ if [[ -n "$ORIGINAL_JUNIT" ]]; then
     PHPUNIT_ARGS+=("--log-junit=${LOCAL_JUNIT}")
 fi
 
-# Start infrastructure (MySQL, RabbitMQ, Redis)
-bin/run-tests setup
-
 # Detect test type for environment setup
 OS="$(uname)"
 if [[ "$OS" == "Darwin" ]]; then
@@ -74,7 +71,7 @@ else
     GAF_INTEGRATION_REDIS_HOST="gaf_integration_redis"
 fi
 
-# Run phpunit directly via bin/gaf-php (preserves quoting of all args)
+# Run phpunit directly (assumes containers are already running via <leader>Tx)
 EXIT_CODE=0
 CONTAINER_NAME="fl-gaf-phpunit" \
 EXTRA_ARGS="--network gaf_integration_network" \
@@ -82,10 +79,8 @@ GAF_INTEGRATION_MYSQL_HOST="$GAF_INTEGRATION_MYSQL_HOST" \
 GAF_INTEGRATION_RABBIT_HOST="$GAF_INTEGRATION_RABBIT_HOST" \
 GAF_INTEGRATION_REDIS_HOST="$GAF_INTEGRATION_REDIS_HOST" \
 GAF_TEST_DOUBLES_ENABLED="true" \
+SETUP=false \
 bin/gaf-php vendor/bin/phpunit "$TEST_PATH" "${PHPUNIT_ARGS[@]}" || EXIT_CODE=$?
-
-# Tear down infrastructure
-bin/run-tests shutdown
 
 # Copy JUnit XML back to where neotest expects it
 if [[ -n "$ORIGINAL_JUNIT" && -f "$LOCAL_JUNIT" ]]; then

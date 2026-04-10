@@ -1,3 +1,11 @@
+local function is_ui_test()
+  return vim.fn.expand("%"):match("ui%-tests/src/.+%.spec%.ts$") ~= nil
+end
+
+local function is_php_test()
+  return vim.bo.filetype == "php"
+end
+
 return {
   {
     "nvim-neotest/neotest",
@@ -11,6 +19,7 @@ return {
       "nvim-neotest/neotest-python",
     },
     keys = {
+      -- General neotest bindings (always visible)
       { "<leader>Tr", function() require("neotest").run.run() end, desc = "Run nearest test" },
       { "<leader>Tf", function() require("neotest").run.run(vim.fn.expand("%")) end, desc = "Run file tests" },
       { "<leader>Ts", function() require("neotest").summary.toggle() end, desc = "Toggle summary" },
@@ -20,9 +29,58 @@ return {
       { "<leader>Tl", function() require("neotest").run.run_last() end, desc = "Run last test" },
       { "<leader>TS", function() require("neotest").run.stop() end, desc = "Stop test" },
     },
+    ft = { "php", "typescript", "javascript", "python" },
     config = function()
+      -- Custom UI test adapter for fl-gaf/fl-gfa webapp projects
+      local ui_tests_adapter = require("config.neotest-ui-tests")
+
+      -- Context-aware buffer-local keybindings
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "*/ui-tests/src/*.spec.ts",
+        callback = function(ev)
+          local opts = { buffer = ev.buf }
+          vim.keymap.set("n", "<leader>Tm", function()
+            require("neotest").run.run({ extra_args = { "--mobile" } })
+          end, vim.tbl_extend("force", opts, { desc = "Run test (mobile)" }))
+          vim.keymap.set("n", "<leader>Tw", function()
+            require("neotest").run.run({ extra_args = { "--watch" } })
+          end, vim.tbl_extend("force", opts, { desc = "Run test (watch)" }))
+        end,
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "php",
+        callback = function(ev)
+          local cwd = vim.fn.getcwd()
+          if not cwd:match("fl%-gaf") then
+            return
+          end
+          vim.keymap.set("n", "<leader>Tx", function()
+            local dir = cwd
+            while dir ~= "/" do
+              if vim.fn.executable(dir .. "/bin/run-tests") == 1 then
+                vim.notify("Setting up test infrastructure...", vim.log.levels.INFO)
+                vim.fn.jobstart({ dir .. "/bin/run-tests", "setup" }, {
+                  cwd = dir,
+                  on_exit = function(_, code)
+                    if code == 0 then
+                      vim.notify("Test infrastructure ready", vim.log.levels.INFO)
+                    else
+                      vim.notify("Test setup failed (exit " .. code .. ")", vim.log.levels.ERROR)
+                    end
+                  end,
+                })
+                return
+              end
+              dir = vim.fn.fnamemodify(dir, ":h")
+            end
+            vim.notify("No bin/run-tests found", vim.log.levels.WARN)
+          end, { buffer = ev.buf, desc = "Setup test infra" })
+        end,
+      })
+
       require("neotest").setup({
         adapters = {
+          ui_tests_adapter,
           require("neotest-phpunit")({
             phpunit_cmd = function()
               -- Use neotest wrapper for fl-gaf projects (handles Docker infra via bin/run-tests)
@@ -35,6 +93,13 @@ return {
           }),
           require("neotest-jest")({
             jestCommand = "npx jest",
+            isTestFile = function(file_path)
+              -- Exclude webapp UI test specs — those are handled by neotest-ui-tests
+              if file_path:match("ui%-tests/src/.+%.spec%.ts$") then
+                return false
+              end
+              return file_path:match("%.test%.[jt]sx?$") or file_path:match("%.spec%.[jt]sx?$")
+            end,
           }),
           require("neotest-python")({
             dap = { justMyCode = false },
