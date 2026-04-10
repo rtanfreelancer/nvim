@@ -1,0 +1,117 @@
+local map = vim.keymap.set
+
+-- Window navigation
+map("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
+map("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
+map("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
+map("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+
+-- Window splits
+map("n", "<leader>|", "<cmd>vsplit<cr>", { desc = "Vertical split" })
+map("n", "<leader>-", "<cmd>split<cr>", { desc = "Horizontal split" })
+
+-- Move lines
+map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move line down" })
+map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move line up" })
+map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move selection down" })
+map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
+
+-- Save / Quit
+map({ "n", "i", "x", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
+
+-- Buffer
+map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
+map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "<leader>bo", "<cmd>%bd|e#|bd#<cr>", { desc = "Close other buffers" })
+
+-- Window resize
+map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
+map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
+map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
+map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
+
+-- Clear search highlights
+map("n", "<esc>", "<cmd>noh<cr><esc>", { desc = "Clear highlights" })
+
+-- LSP / Code actions
+map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+map("v", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+map("n", "<leader>cA", function()
+  vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })
+end, { desc = "Source action" })
+map("n", "<leader>cr", function()
+  return ":IncRename " .. vim.fn.expand("<cword>")
+end, { expr = true, desc = "Rename symbol (inc)" })
+map("n", "<leader>cf", function() require("conform").format({ async = true }) end, { desc = "Format file" })
+map("n", "K", vim.lsp.buf.hover, { desc = "Hover docs" })
+map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
+map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "Prev diagnostic" })
+map("n", "]d", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Next diagnostic" })
+map("n", "[e", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR }) end, { desc = "Prev error" })
+map("n", "]e", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR }) end, { desc = "Next error" })
+map("n", "[w", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.WARN }) end, { desc = "Prev warning" })
+map("n", "]w", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.WARN }) end, { desc = "Next warning" })
+
+-- Inlay hints toggle
+map("n", "<leader>ci", function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = "Toggle inlay hints" })
+
+-- Toggle diagnostics
+map("n", "<leader>td", function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = "Toggle diagnostics" })
+
+-- Toggle format-on-save
+map("n", "<leader>uf", function()
+  vim.g.disable_autoformat = not vim.g.disable_autoformat
+  vim.notify(vim.g.disable_autoformat and "Format-on-save disabled" or "Format-on-save enabled")
+end, { desc = "Toggle format-on-save" })
+
+-- Better indentation (keep selection)
+map("v", "<", "<gv")
+map("v", ">", ">gv")
+
+-- Paste without overwriting register
+map("x", "<leader>p", [["_dP]], { desc = "Paste without overwrite" })
+
+-- New file
+map("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New file" })
+
+-- Quickfix / Location list
+map("n", "<leader>xq", function()
+  for _, win in ipairs(vim.fn.getwininfo()) do
+    if win.quickfix == 1 and win.loclist == 0 then
+      vim.cmd.cclose()
+      return
+    end
+  end
+  vim.cmd.copen()
+end, { desc = "Toggle quickfix" })
+map("n", "<leader>xl", function()
+  for _, win in ipairs(vim.fn.getwininfo()) do
+    if win.loclist == 1 then
+      vim.cmd.lclose()
+      return
+    end
+  end
+  pcall(vim.cmd.lopen)
+end, { desc = "Toggle loclist" })
+
+-- Grep word under cursor
+map("n", "gw", function()
+  Snacks.picker.grep({ search = vim.fn.expand("<cword>") })
+end, { desc = "Grep word under cursor" })
+
+-- Terminal escape
+map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+-- Center after jumps
+map("n", "<C-d>", "<C-d>zz", { desc = "Half page down (centered)" })
+map("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
+map("n", "n", [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>zzzv]], { desc = "Next search result (centered)" })
+map("n", "N", [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>zzzv]], { desc = "Prev search result (centered)" })
+
+-- Join without moving cursor
+map("n", "J", "mzJ`z", { desc = "Join lines" })
