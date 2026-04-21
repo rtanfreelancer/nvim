@@ -282,7 +282,7 @@ return {
         { "<leader>gh", group = "hunks" },
         { "<leader>b",  group = "buffer" },
         { "<leader>q",  group = "quit/session" },
-        { "<leader>t",  group = "toggle" },
+        { "<leader>t",  group = "todo" },
         { "<leader>u",  group = "ui" },
         { "<leader>x",  group = "diagnostics" },
         { "<leader>c",  group = "code" },
@@ -302,9 +302,68 @@ return {
   },
   {
     "bngarren/checkmate.nvim",
-    ft = "markdown", -- Lazy loads for Markdown files matching patterns in 'files'
+    ft = "markdown", -- activates on markdown files matching `files` patterns below
     opts = {
       -- files = { "*.md" }, -- any .md file (instead of defaults)
+      keys = {
+        ["<leader>tt"] = { rhs = "<cmd>Checkmate toggle<CR>",          desc = "Toggle todo item",        modes = { "n", "v" } },
+        ["<leader>tc"] = { rhs = "<cmd>Checkmate check<CR>",           desc = "Check todo item",         modes = { "n", "v" } },
+        ["<leader>tu"] = { rhs = "<cmd>Checkmate uncheck<CR>",         desc = "Uncheck todo item",       modes = { "n", "v" } },
+        ["<leader>t="] = { rhs = "<cmd>Checkmate cycle_next<CR>",      desc = "Cycle next state",        modes = { "n", "v" } },
+        ["<leader>t-"] = { rhs = "<cmd>Checkmate cycle_previous<CR>",  desc = "Cycle previous state",    modes = { "n", "v" } },
+        ["<leader>tn"] = { rhs = "<cmd>Checkmate create<CR>",          desc = "New todo item",           modes = { "n", "v" } },
+        ["<leader>tx"] = { rhs = "<cmd>Checkmate remove<CR>",          desc = "Remove todo marker",      modes = { "n", "v" } },
+        ["<leader>tR"] = { rhs = "<cmd>Checkmate metadata remove_all<CR>", desc = "Remove all metadata", modes = { "n", "v" } },
+        ["<leader>ta"] = { rhs = "<cmd>Checkmate archive<CR>",         desc = "Archive completed",       modes = { "n" } },
+        ["<leader>tf"] = { rhs = "<cmd>Checkmate select_todo<CR>",     desc = "Find todo (picker)",      modes = { "n" } },
+        ["<leader>tv"] = { rhs = "<cmd>Checkmate metadata select_value<CR>", desc = "Set metadata value", modes = { "n" } },
+        ["<leader>t]"] = { rhs = "<cmd>Checkmate metadata jump_next<CR>",     desc = "Next metadata tag",  modes = { "n" } },
+        ["<leader>t["] = { rhs = "<cmd>Checkmate metadata jump_previous<CR>", desc = "Prev metadata tag",  modes = { "n" } },
+      },
+      -- Metadata `key` fields override the defaults' <leader>T* mappings onto <leader>t*.
+      -- Providing an entry here fully replaces that metadata's default, so copy any fields you want to keep.
+      metadata = {
+        priority = {
+          style = function(context)
+            local value = context.value:lower()
+            if value == "high" then
+              return { fg = "#ff5555", bold = true }
+            elseif value == "medium" then
+              return { fg = "#ffb86c" }
+            elseif value == "low" then
+              return { fg = "#8be9fd" }
+            else
+              return { fg = "#8be9fd" }
+            end
+          end,
+          get_value = function() return "medium" end,
+          choices = function() return { "low", "medium", "high" } end,
+          key = "<leader>tp",
+          sort_order = 10,
+          jump_to_on_insert = "value",
+          select_on_insert = true,
+        },
+        started = {
+          aliases = { "init" },
+          style = { fg = "#9fd6d5" },
+          get_value = function() return tostring(os.date("%m/%d/%y %H:%M")) end,
+          key = "<leader>ts",
+          sort_order = 20,
+        },
+        done = {
+          aliases = { "completed", "finished" },
+          style = { fg = "#96de7a" },
+          get_value = function() return tostring(os.date("%m/%d/%y %H:%M")) end,
+          key = "<leader>td",
+          on_add = function(todo)
+            require("checkmate").set_todo_state(todo, "checked")
+          end,
+          on_remove = function(todo)
+            require("checkmate").set_todo_state(todo, "unchecked")
+          end,
+          sort_order = 30,
+        },
+      },
     },
   }
 }

@@ -53,7 +53,7 @@ map("n", "<leader>ci", function()
 end, { desc = "Toggle inlay hints" })
 
 -- Toggle diagnostics
-map("n", "<leader>td", function()
+map("n", "<leader>ud", function()
   vim.diagnostic.enable(not vim.diagnostic.is_enabled())
 end, { desc = "Toggle diagnostics" })
 
