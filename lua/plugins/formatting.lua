@@ -15,6 +15,7 @@ return {
         typescriptreact = { "prettierd", "prettier", stop_after_first = true },
         php = in_freelancer and { "php_cs_fixer" } or { "pint" },
         blade = { "blade-formatter" },
+        python = { "ruff_organize_imports", "ruff_format" },
       },
       formatters = in_freelancer and {
         pint = {

@@ -12,7 +12,8 @@ return {
     "mason-org/mason-lspconfig.nvim",
     dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
-      ensure_installed = { "vtsls", "eslint", "pyright", "tailwindcss" },
+      -- Note: TypeScript is handled by typescript-tools.nvim (productivity.lua), not vtsls/ts_ls.
+      ensure_installed = { "eslint", "basedpyright", "ruff", "tailwindcss", "jsonls", "yamlls" },
     },
   },
 
@@ -24,54 +25,7 @@ return {
     config = function()
       local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-      -- TypeScript (vtsls - faster, better auto-imports than ts_ls)
-      -- Override root_dir to nil so root_markers is actually used
-      -- (base vtsls config defines root_dir as a function which makes root_markers dead code)
-      vim.lsp.config("vtsls", {
-        capabilities = capabilities,
-        root_dir = function(bufnr, on_dir)
-          local root = vim.fs.root(bufnr, { "tsconfig.json", "package.json" })
-          on_dir(root or vim.fn.getcwd())
-        end,
-        settings = {
-          vtsls = {
-            autoUseWorkspaceTsdk = true,
-          },
-          typescript = {
-            updateImportsOnFileMove = { enabled = "always" },
-            suggest = {
-              completeFunctionCalls = true,
-              autoImports = true,
-            },
-            preferences = {
-              importModuleSpecifier = "relative",
-              includePackageJsonAutoImports = "auto",
-            },
-            inlayHints = {
-              includeInlayParameterNameHints = "all",
-              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayEnumMemberValueHints = true,
-            },
-          },
-          javascript = {
-            updateImportsOnFileMove = { enabled = "always" },
-            suggest = {
-              completeFunctionCalls = true,
-              autoImports = true,
-            },
-            inlayHints = {
-              includeInlayParameterNameHints = "all",
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-            },
-          },
-        },
-      })
+      -- TypeScript is handled by typescript-tools.nvim (see productivity.lua).
 
       -- ESLint
       vim.lsp.config("eslint", {
@@ -86,22 +40,30 @@ return {
         },
       })
 
-      -- Pyright
-      local pyright_analysis = {
+      -- basedpyright (community fork of pyright with stronger inference)
+      local basedpyright_analysis = {
         autoSearchPaths = true,
         useLibraryCodeForTypes = true,
         autoImportCompletions = true,
       }
       if in_freelancer then
-        pyright_analysis.extraPaths = { "libgafthrift", "restutils" }
+        basedpyright_analysis.extraPaths = { "libgafthrift", "restutils" }
       end
-      vim.lsp.config("pyright", {
+      vim.lsp.config("basedpyright", {
         capabilities = capabilities,
         settings = {
-          python = {
-            analysis = pyright_analysis,
+          basedpyright = {
+            analysis = basedpyright_analysis,
           },
         },
+      })
+
+      -- Ruff (lint + format + organize imports; defer hover to basedpyright)
+      vim.lsp.config("ruff", {
+        capabilities = capabilities,
+        on_attach = function(client, _)
+          client.server_capabilities.hoverProvider = false
+        end,
       })
 
       -- Phpantom (PHP)
@@ -110,6 +72,28 @@ return {
         cmd = { vim.fn.expand("~/libs/bin/phpantom_lsp") },
         filetypes = { "php" },
         root_markers = { "composer.json", ".git" },
+      })
+
+      -- JSON LSP with SchemaStore catalog (package.json, tsconfig, composer.json, GH Actions, ...)
+      vim.lsp.config("jsonls", {
+        capabilities = capabilities,
+        settings = {
+          json = {
+            schemas = require("schemastore").json.schemas(),
+            validate = { enable = true },
+          },
+        },
+      })
+
+      -- YAML LSP with SchemaStore catalog
+      vim.lsp.config("yamlls", {
+        capabilities = capabilities,
+        settings = {
+          yaml = {
+            schemaStore = { enable = false, url = "" }, -- disable built-in; use SchemaStore.nvim instead
+            schemas = require("schemastore").yaml.schemas(),
+          },
+        },
       })
 
       -- Tailwind CSS (used with Livewire/Blade views)
@@ -130,7 +114,7 @@ return {
         },
       })
 
-      local servers = { "vtsls", "eslint", "pyright", "phpantom" }
+      local servers = { "eslint", "basedpyright", "ruff", "phpantom", "jsonls", "yamlls" }
       if not in_freelancer then
         table.insert(servers, "tailwindcss")
       end
@@ -190,6 +174,15 @@ return {
     "smjonas/inc-rename.nvim",
     cmd = "IncRename",
     config = true,
+  },
+
+  -- LSP code action preview (diff before applying). Replaces <leader>ca.
+  {
+    "aznhe21/actions-preview.nvim",
+    keys = {
+      { "<leader>ca", function() require("actions-preview").code_actions() end, mode = { "n", "v" }, desc = "Code action (preview)" },
+    },
+    opts = {},
   },
 
   -- Trouble

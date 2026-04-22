@@ -88,6 +88,14 @@ return {
     end,
   },
 
+  -- Visual merge-conflict resolution (co/ct/cb/c0, ]x/[x)
+  {
+    "akinsho/git-conflict.nvim",
+    version = "*",
+    event = "BufReadPre",
+    config = true,
+  },
+
   -- Git diff viewer
   {
     "sindrets/diffview.nvim",

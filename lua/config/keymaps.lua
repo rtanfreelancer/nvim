@@ -28,9 +28,7 @@ map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window w
 -- Clear search highlights
 map("n", "<esc>", "<cmd>noh<cr><esc>", { desc = "Clear highlights" })
 
--- LSP / Code actions
-map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-map("v", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+-- LSP / Code actions (<leader>ca handled by actions-preview.nvim plugin spec)
 map("n", "<leader>cA", function()
   vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })
 end, { desc = "Source action" })

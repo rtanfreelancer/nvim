@@ -16,6 +16,7 @@ return {
       -- Adapters
       "olimorris/neotest-phpunit",
       "nvim-neotest/neotest-jest",
+      "marilari88/neotest-vitest",
       "nvim-neotest/neotest-python",
     },
     keys = {
@@ -99,6 +100,27 @@ return {
                 return false
               end
               return file_path:match("%.test%.[jt]sx?$") or file_path:match("%.spec%.[jt]sx?$")
+            end,
+          }),
+          require("neotest-vitest")({
+            -- Only claim vitest specs so jest/ui-tests adapters still match their own patterns
+            filter_dir = function(name, _, _)
+              return name ~= "node_modules" and name ~= "ui-tests"
+            end,
+            is_test_file = function(file_path)
+              if file_path:match("ui%-tests/src/.+%.spec%.ts$") then
+                return false
+              end
+              if not (file_path:match("%.test%.[jt]sx?$") or file_path:match("%.spec%.[jt]sx?$")) then
+                return false
+              end
+              -- Heuristic: only claim files whose project uses vitest
+              local dir = vim.fs.dirname(file_path)
+              local pkg = vim.fs.find("package.json", { upward = true, path = dir })[1]
+              if not pkg then return false end
+              local ok, contents = pcall(vim.fn.readfile, pkg)
+              if not ok then return false end
+              return table.concat(contents, "\n"):match("vitest") ~= nil
             end,
           }),
           require("neotest-python")({
