@@ -73,56 +73,6 @@ return {
     },
   },
 
-  -- Minimal, beautiful bufferline
-  {
-    "willothy/nvim-cokeline",
-    event = "VeryLazy",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-    },
-    keys = {
-      { "<S-h>", "<Plug>(cokeline-focus-prev)", desc = "Prev buffer" },
-      { "<S-l>", "<Plug>(cokeline-focus-next)", desc = "Next buffer" },
-      { "<leader>bp", "<Plug>(cokeline-pick-focus)", desc = "Pick buffer" },
-    },
-    config = function()
-      local get_hex = require("cokeline.hlgroups").get_hl_attr
-      require("cokeline").setup({
-        default_hl = {
-          fg = function(buffer)
-            return buffer.is_focused and get_hex("Normal", "fg") or get_hex("Comment", "fg")
-          end,
-          bg = "NONE",
-        },
-        components = {
-          { text = " " },
-          {
-            text = function(buffer) return (buffer.devicon.icon or "") .. " " end,
-            fg = function(buffer) return buffer.devicon.color end,
-          },
-          { text = function(buffer) return buffer.filename .. " " end,
-            bold = function(buffer) return buffer.is_focused end },
-          {
-            text = function(buffer) return buffer.is_modified and "● " or "  " end,
-            fg = function(buffer) return buffer.is_modified and "#f6c177" or nil end,
-          },
-        },
-      })
-    end,
-  },
-
-  -- TODO/FIX/NOTE highlighting
-  {
-    "folke/todo-comments.nvim",
-    event = "BufReadPost",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {},
-    keys = {
-      { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo comments" },
-    },
-  },
-
   -- Code chunk / scope highlighting
   {
     "shellRaining/hlchunk.nvim",

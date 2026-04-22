@@ -28,6 +28,9 @@ map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window w
 -- Clear search highlights
 map("n", "<esc>", "<cmd>noh<cr><esc>", { desc = "Clear highlights" })
 
+-- Terminal: double-Esc exits terminal mode (single Esc still passes through to TUI apps)
+map("t", "<esc><esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
 -- LSP / Code actions (<leader>ca handled by actions-preview.nvim plugin spec)
 map("n", "<leader>cA", function()
   vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })

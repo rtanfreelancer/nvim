@@ -7,7 +7,6 @@ return {
     opts = {
       image = { enabled = true },
       picker = { enabled = true },
-      explorer = { enabled = false },
       lazygit = { enabled = true },
       terminal = { enabled = true },
       indent = { enabled = true, animate = { enabled = true } },
@@ -132,7 +131,7 @@ return {
       { "<leader>s.", function() Snacks.picker.grep({ cwd = vim.fn.expand("%:p:h") }) end, desc = "Grep in current file dir" },
       -- Tools
       { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
-      { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename file" },
+      { "<leader>fR", function() Snacks.rename.rename_file() end, desc = "Rename file" },
     },
   },
 }
