@@ -53,11 +53,12 @@ return {
     opts = {},
   },
 
-  -- Autopairs
+  -- Autopairs (ultimate-autopair — smarter multiline / JSX handling)
   {
-    "echasnovski/mini.pairs",
-    event = "InsertEnter",
-    config = true,
+    "altermo/ultimate-autopair.nvim",
+    event = { "InsertEnter", "CmdlineEnter" },
+    branch = "v0.6",
+    opts = {},
   },
 
   -- Surround (gs prefix)
@@ -102,17 +103,19 @@ return {
     },
   },
 
-  -- Inline markdown rendering (headings, code blocks, tables, lists)
+  -- Inline markdown rendering (headings, code blocks, tables, LaTeX, mermaid, links)
   {
-    "MeanderingProgrammer/render-markdown.nvim",
+    "OXY2DEV/markview.nvim",
+    lazy = false,
     dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" },
-    ft = { "markdown" },
     keys = {
-      { "<leader>uM", "<cmd>RenderMarkdown toggle<cr>", desc = "Toggle markdown render" },
+      { "<leader>uM", "<cmd>Markview Toggle<cr>", desc = "Toggle markdown render" },
     },
     opts = {
-      completions = { lsp = { enabled = true } },
-      code = { width = "block", right_pad = 2 },
+      preview = {
+        filetypes = { "markdown", "codecompanion", "Avante" },
+        ignore_buftypes = {},
+      },
     },
   },
 
@@ -328,6 +331,9 @@ return {
         { "<leader>S",  group = "snippets" },
         { "<leader>l",  group = "laravel" },
         { "<leader>R",  group = "rest" },
+        { "<leader>a",  group = "ai/claude" },
+        { "<leader>D",  group = "database" },
+        { "<leader>gw", group = "worktree" },
         { "g",          group = "goto" },
         { "gs",         group = "surround" },
       },

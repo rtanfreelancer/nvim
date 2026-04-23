@@ -30,4 +30,126 @@ return {
       { "<leader>qd", function() require("persistence").stop() end, desc = "Don't save current session" },
     },
   },
+
+  -- Step through a file's git history commit-by-commit
+  {
+    "FredeHoey/tardis.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "Tardis" },
+    keys = {
+      { "<leader>gt", "<cmd>Tardis git<cr>", desc = "Tardis (time travel file)" },
+    },
+    opts = {
+      keymap = {
+        next = "<C-j>",
+        prev = "<C-k>",
+        quit = "q",
+        revision_message = "m",
+        commit = "c",
+      },
+      initial_revisions = 10,
+      max_revisions = 100,
+    },
+  },
+
+  -- Git worktree switcher (chdirs into selected worktree)
+  {
+    "polarmutex/git-worktree.nvim",
+    version = "^2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      {
+        "<leader>gwl",
+        function()
+          local wt = require("git-worktree")
+          -- Simple picker using vim.ui.select
+          local branches = vim.fn.systemlist("git worktree list")
+          vim.ui.select(branches, { prompt = "Switch worktree" }, function(choice)
+            if not choice then return end
+            local path = choice:match("^(%S+)")
+            if path then wt.switch_worktree(path) end
+          end)
+        end,
+        desc = "List / switch worktree",
+      },
+      {
+        "<leader>gwc",
+        function()
+          vim.ui.input({ prompt = "New worktree path: " }, function(path)
+            if not path or path == "" then return end
+            vim.ui.input({ prompt = "Upstream branch: " }, function(branch)
+              if not branch or branch == "" then return end
+              require("git-worktree").create_worktree(path, branch)
+            end)
+          end)
+        end,
+        desc = "Create worktree",
+      },
+      {
+        "<leader>gwd",
+        function()
+          vim.ui.input({ prompt = "Delete worktree path: " }, function(path)
+            if not path or path == "" then return end
+            require("git-worktree").delete_worktree(path)
+          end)
+        end,
+        desc = "Delete worktree",
+      },
+    },
+    config = function()
+      local wt = require("git-worktree")
+      wt.setup({})
+      -- Hook: after switching worktree, cwd is already changed; refresh UI.
+      wt.on_tree_change(function(op, metadata)
+        if op == wt.Operations.Switch then
+          vim.notify("Worktree: " .. metadata.path, vim.log.levels.INFO)
+        end
+      end)
+    end,
+  },
+
+  -- Claude Code terminal toggle
+  {
+    "greggh/claude-code.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "ClaudeCode", "ClaudeCodeContinue", "ClaudeCodeResume", "ClaudeCodeVerbose" },
+    keys = {
+      { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude Code" },
+      { "<leader>aC", "<cmd>ClaudeCodeContinue<cr>", desc = "Claude Code continue" },
+      { "<leader>ar", "<cmd>ClaudeCodeResume<cr>", desc = "Claude Code resume" },
+      { "<leader>av", "<cmd>ClaudeCodeVerbose<cr>", desc = "Claude Code verbose" },
+    },
+    opts = {
+      window = {
+        split_ratio = 0.4,
+        position = "vertical",
+        enter_insert = true,
+        start_in_normal_mode = false,
+        hide_numbers = true,
+        hide_signcolumn = true,
+      },
+      refresh = {
+        enable = true,
+        updatetime = 100,
+        timer_interval = 1000,
+        show_notifications = true,
+      },
+      git = { use_git_root = true },
+      command = "claude",
+    },
+  },
+
+  -- Database UI
+  {
+    "kndndrj/nvim-dbee",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    build = function() require("dbee").install() end,
+    cmd = { "Dbee" },
+    keys = {
+      { "<leader>Do", function() require("dbee").open() end, desc = "Dbee open" },
+      { "<leader>Dc", function() require("dbee").close() end, desc = "Dbee close" },
+      { "<leader>Dt", function() require("dbee").toggle() end, desc = "Dbee toggle" },
+    },
+    opts = {},
+  },
 }
