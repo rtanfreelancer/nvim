@@ -31,27 +31,6 @@ return {
     },
   },
 
-  -- Step through a file's git history commit-by-commit
-  {
-    "FredeHoey/tardis.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = { "Tardis" },
-    keys = {
-      { "<leader>gt", "<cmd>Tardis git<cr>", desc = "Tardis (time travel file)" },
-    },
-    opts = {
-      keymap = {
-        next = "<C-j>",
-        prev = "<C-k>",
-        quit = "q",
-        revision_message = "m",
-        commit = "c",
-      },
-      initial_revisions = 10,
-      max_revisions = 100,
-    },
-  },
-
   -- Git worktree switcher (chdirs into selected worktree)
   {
     "polarmutex/git-worktree.nvim",
@@ -139,17 +118,4 @@ return {
     },
   },
 
-  -- Database UI
-  {
-    "kndndrj/nvim-dbee",
-    dependencies = { "MunifTanjim/nui.nvim" },
-    build = function() require("dbee").install() end,
-    cmd = { "Dbee" },
-    keys = {
-      { "<leader>Do", function() require("dbee").open() end, desc = "Dbee open" },
-      { "<leader>Dc", function() require("dbee").close() end, desc = "Dbee close" },
-      { "<leader>Dt", function() require("dbee").toggle() end, desc = "Dbee toggle" },
-    },
-    opts = {},
-  },
 }

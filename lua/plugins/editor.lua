@@ -106,10 +106,10 @@ return {
   -- Inline markdown rendering (headings, code blocks, tables, LaTeX, mermaid, links)
   {
     "OXY2DEV/markview.nvim",
-    lazy = false,
+    ft = { "markdown", "codecompanion", "Avante" },
     dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" },
     keys = {
-      { "<leader>uM", "<cmd>Markview Toggle<cr>", desc = "Toggle markdown render" },
+      { "<leader>uM", "<cmd>Markview Toggle<cr>", desc = "Toggle markdown render", ft = { "markdown", "codecompanion", "Avante" } },
     },
     opts = {
       preview = {
@@ -159,18 +159,6 @@ return {
       { "P",     "<Plug>(YankyPutBefore)",     mode = { "n", "x" },     desc = "Put before" },
       { "<C-p>", "<Plug>(YankyPreviousEntry)", desc = "Prev yank entry" },
       { "<C-n>", "<Plug>(YankyNextEntry)",     desc = "Next yank entry" },
-    },
-  },
-
-  -- Documentation generator
-  {
-    "danymat/neogen",
-    cmd = "Neogen",
-    keys = {
-      { "<leader>cn", function() require("neogen").generate() end, desc = "Generate annotation" },
-    },
-    opts = {
-      snippet_engine = "nvim",
     },
   },
 
@@ -427,29 +415,6 @@ return {
   -- Case-preserving :Subvert/:S and `crs`/`crc`/`crm`/`cru`/`cr-`/`cr.` case coercions
   { "tpope/vim-abolish", event = "VeryLazy" },
 
-  -- Structural (Treesitter) search & replace
-  {
-    "cshuaimin/ssr.nvim",
-    keys = {
-      { "<leader>sS", function() require("ssr").open() end, mode = { "n", "x" }, desc = "Structural replace (SSR)" },
-    },
-    opts = {
-      border = "rounded",
-      min_width = 50,
-      min_height = 5,
-      keymaps = {
-        close = "q",
-        next_match = "n",
-        prev_match = "N",
-        replace_confirm = "<cr>",
-        replace_all = "<leader><cr>",
-      },
-    },
-    config = function(_, opts)
-      require("ssr").setup(opts)
-    end,
-  },
-
   -- Highlight other uses of the symbol under cursor (LSP/Treesitter/regex)
   {
     "RRethy/vim-illuminate",
@@ -466,22 +431,4 @@ return {
     end,
   },
 
-  -- Better macro UX (edit, yank, named slots, status)
-  {
-    "chrisgrieser/nvim-recorder",
-    event = "VeryLazy",
-    opts = {
-      slots = { "a", "b" },
-      mapping = {
-        startStopRecording = "q",
-        playMacro = "Q",
-        switchSlot = "<leader>Qs",
-        editMacro = "<leader>qe",
-        yankMacro = "<leader>qy",
-        addBreakPoint = "##",
-      },
-      clear = false,
-      logLevel = vim.log.levels.INFO,
-    },
-  },
 }

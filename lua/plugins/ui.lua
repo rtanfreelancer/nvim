@@ -73,18 +73,6 @@ return {
     },
   },
 
-  -- Code chunk / scope highlighting
-  {
-    "shellRaining/hlchunk.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {
-      chunk = { enable = true, style = "#c4a7e7" },
-      indent = { enable = false }, -- snacks.indent handles this
-      line_num = { enable = true, style = "#c4a7e7" },
-      blank = { enable = false },
-    },
-  },
-
   -- Rainbow brackets via Treesitter
   {
     "HiPhish/rainbow-delimiters.nvim",
@@ -119,34 +107,6 @@ return {
     end,
   },
 
-  -- Minimap
-  {
-    "echasnovski/mini.map",
-    event = { "BufReadPost", "BufNewFile" },
-    keys = {
-      { "<leader>um", function() require("mini.map").toggle() end, desc = "Toggle minimap" },
-    },
-    config = function()
-      local map = require("mini.map")
-      map.setup({
-        integrations = {
-          map.gen_integration.diagnostic(),
-          map.gen_integration.builtin_search(),
-          map.gen_integration.diff(),
-        },
-        symbols = {
-          encode = map.gen_encode_symbols.dot("4x2"),
-        },
-        window = {
-          focusable = false,
-          width = 15,
-          winblend = 0,
-        },
-      })
-      map.close()
-    end,
-  },
-
   -- Distraction-free coding
   {
     "folke/zen-mode.nvim",
@@ -170,22 +130,17 @@ return {
         view = "cmdline", -- use inline cmdline to avoid E11 split errors in command-line window
       },
       lsp = {
+        hover = { enabled = true },
+        signature = { enabled = false }, -- blink.cmp handles signature help
+        message = { enabled = true },
+        progress = { enabled = false },  -- fidget.nvim owns LSP progress
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
-        },
-        hover = {
-          enabled = true,
-          opts = {
-            size = { max_width = 80, max_height = 25 },
-          },
-        },
-        signature = {
-          enabled = false, -- blink.cmp handles signature help
+          ["cmp.entry.get_documentation"] = true,
         },
       },
       presets = {
-        lsp_doc_border = true,
         long_message_to_split = true,
       },
     },

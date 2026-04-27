@@ -35,12 +35,12 @@ return {
     },
   },
 
-  -- Blade file navigation + Livewire component navigation
+  -- Blade view / component / route navigation (gf in blade files)
   {
     "ricardoramirezr/blade-nav.nvim",
+    dependencies = { "saghen/blink.cmp" },
     ft = { "blade", "php" },
-    opts = {
-      close_tag_on_complete = true,
-    },
+    opts = {},
   },
+
 }

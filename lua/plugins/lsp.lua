@@ -10,10 +10,11 @@ return {
 
   {
     "mason-org/mason-lspconfig.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
       -- Note: TypeScript is handled by typescript-tools.nvim (productivity.lua), not vtsls/ts_ls.
-      ensure_installed = { "eslint", "basedpyright", "ruff", "tailwindcss", "jsonls", "yamlls" },
+      ensure_installed = { "eslint", "basedpyright", "ruff", "tailwindcss", "jsonls", "yamlls", "html", "cssls", "intelephense" },
     },
   },
 
@@ -66,12 +67,19 @@ return {
         end,
       })
 
-      -- Phpantom (PHP)
-      vim.lsp.config("phpantom", {
+      -- Intelephense (PHP) — replaces phpantom
+      vim.lsp.config("intelephense", {
         capabilities = capabilities,
-        cmd = { vim.fn.expand("~/libs/bin/phpantom_lsp") },
-        filetypes = { "php" },
+        filetypes = { "php", "blade" },
         root_markers = { "composer.json", ".git" },
+        settings = {
+          intelephense = {
+            files = {
+              maxSize = 5000000,
+              associations = { "*.php", "*.blade.php" },
+            },
+          },
+        },
       })
 
       -- JSON LSP with SchemaStore catalog (package.json, tsconfig, composer.json, GH Actions, ...)
@@ -114,7 +122,33 @@ return {
         },
       })
 
-      local servers = { "eslint", "basedpyright", "ruff", "phpantom", "jsonls", "yamlls" }
+      -- HTML LSP — extended to blade/php; let blade-formatter own formatting.
+      -- autoClosingTags disabled: nvim-ts-autotag already handles close-tag insertion;
+      -- leaving this on causes duplicate `</tag>` (one from autotag, one from LSP completion).
+      vim.lsp.config("html", {
+        capabilities = capabilities,
+        filetypes = { "html", "blade", "php" },
+        init_options = {
+          provideFormatter = false,
+          configurationSection = { "html", "css", "javascript" },
+          embeddedLanguages = { css = true, javascript = true },
+        },
+        settings = {
+          html = {
+            autoClosingTags = false,
+          },
+        },
+      })
+
+      -- CSS LSP — only on pure CSS files. Do NOT attach to blade: cssls treats
+      -- the whole buffer as CSS, polluting completions and breaking formatting.
+      -- Embedded <style> blocks in blade get syntax highlighting via treesitter injections.
+      vim.lsp.config("cssls", {
+        capabilities = capabilities,
+        filetypes = { "css", "scss", "less" },
+      })
+
+      local servers = { "eslint", "basedpyright", "ruff", "intelephense", "jsonls", "yamlls", "html", "cssls" }
       if not in_freelancer then
         table.insert(servers, "tailwindcss")
       end

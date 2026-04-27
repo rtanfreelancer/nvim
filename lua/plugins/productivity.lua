@@ -52,21 +52,6 @@ return {
     },
   },
 
-  -- Project-wide async `tsc --noEmit` into quickfix
-  {
-    "dmmulroy/tsc.nvim",
-    cmd = "TSC",
-    opts = {
-      auto_open_qflist = true,
-      auto_close_qflist = false,
-      use_trouble_qflist = true,
-      run_as_monorepo = false,
-    },
-    keys = {
-      { "<leader>ct", "<cmd>TSC<cr>", desc = "TS: project typecheck" },
-    },
-  },
-
   -- Auto-convert "..." to `...` when typing ${
   {
     "axelvc/template-string.nvim",
@@ -100,23 +85,6 @@ return {
     },
   },
 
-  -- LSP progress/loading indicator in corner
-  {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    opts = {
-      progress = {
-        display = {
-          progress_icon = { pattern = "dots" },
-          done_icon = "✓",
-        },
-      },
-      notification = {
-        window = { winblend = 0 },
-      },
-    },
-  },
-
   -- Break bad habits: blocks hjkl spam and arrow keys, nudges toward real motions
   {
     "m4xshen/hardtime.nvim",
@@ -138,7 +106,11 @@ return {
   -- Decorated scrollbar: diagnostics, search, git hunks, marks
   {
     "lewis6991/satellite.nvim",
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufNewFile" },
+    keys = {
+      { "<leader>us", "<cmd>SatelliteEnable<cr>", desc = "Enable scrollbar" },
+      { "<leader>uS", "<cmd>SatelliteDisable<cr>", desc = "Disable scrollbar" },
+    },
     opts = {
       current_only = false,
       winblend = 50,

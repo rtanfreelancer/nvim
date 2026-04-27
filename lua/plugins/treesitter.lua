@@ -13,7 +13,7 @@ return {
     end,
     config = function()
       require("nvim-treesitter").install({
-        "bash", "css", "eruby", "html", "javascript", "json", "lua",
+        "bash", "blade", "css", "eruby", "html", "javascript", "json", "lua",
         "markdown", "markdown_inline", "php", "php_only", "python", "regex",
         "ruby", "tsx", "typescript", "vim", "vimdoc", "yaml",
       })
@@ -23,8 +23,9 @@ return {
         group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
         callback = function(args)
           pcall(vim.treesitter.start, args.buf)
-          -- Enable treesitter-based indentation
-          if vim.treesitter.get_parser(args.buf, nil, { error = false }) then
+          -- Enable treesitter-based indentation (skip blade — grammar has no indents.scm)
+          if vim.bo[args.buf].filetype ~= "blade"
+            and vim.treesitter.get_parser(args.buf, nil, { error = false }) then
             vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
         end,
