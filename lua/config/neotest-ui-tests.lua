@@ -66,13 +66,10 @@ function adapter.build_spec(args)
   local position = args.tree:data()
   local path = position.path
 
-  -- Extract project name and spec filename from the path
-  -- Pattern: projects/<project>/ui-tests/src/<folder>/<spec>.spec.ts
-  local project, spec_name = path:match("projects/([^/]+)/ui%-tests/src/[^/]+/(.+)%.spec%.ts$")
+  -- Extract project name from the path
+  -- Pattern: projects/<project>/ui-tests/src/...
+  local project = path:match("projects/([^/]+)/ui%-tests/src/")
   if not project then
-    project, spec_name = path:match("projects/([^/]+)/ui%-tests/src/(.+)%.spec%.ts$")
-  end
-  if not spec_name then
     return {}
   end
 
@@ -81,8 +78,9 @@ function adapter.build_spec(args)
     return {}
   end
 
-  -- Use the exact filename to avoid matching other specs in the same folder
-  local specs_pattern = spec_name .. ".spec.ts"
+  -- SPECS = bare filename, regardless of folder depth
+  local specs_pattern = vim.fn.fnamemodify(path, ":t")
+  local spec_name = specs_pattern:gsub("%.spec%.ts$", "")
 
   -- Check for --mobile and --watch flags in extra_args
   local is_mobile = false
