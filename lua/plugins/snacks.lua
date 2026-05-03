@@ -70,9 +70,9 @@ return {
     },
     keys = {
       -- Find
-      { "<leader>ff", function() Snacks.picker.files() end, desc = "Find files" },
+      { "<leader><leader>", function() Snacks.picker.files() end, desc = "Find files" },
       { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent files" },
-      { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Buffers" },
+      { "<leader>.", function() Snacks.picker.buffers() end, desc = "Buffers" },
       -- Search
       { "<leader>sg", function() Snacks.picker.grep() end, desc = "Grep" },
       { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Grep word", mode = { "n", "x" } },

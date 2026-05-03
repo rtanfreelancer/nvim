@@ -2,15 +2,16 @@ return {
   -- Task runner
   {
     "stevearc/overseer.nvim",
-    cmd = { "OverseerRun", "OverseerRunCmd", "OverseerToggle", "OverseerTaskAction" },
+    cmd = { "OverseerRun", "OverseerShell", "OverseerToggle", "OverseerTaskAction", "OverseerOpen", "OverseerClose" },
     keys = {
       { "<leader>or", "<cmd>OverseerRun<cr>", desc = "Run task" },
-      { "<leader>oc", "<cmd>OverseerRunCmd<cr>", desc = "Run shell command" },
+      { "<leader>oc", "<cmd>OverseerShell<cr>", desc = "Run shell command" },
       { "<leader>ot", "<cmd>OverseerToggle<cr>", desc = "Toggle task list" },
       { "<leader>ol", "<cmd>OverseerTaskAction<cr>", desc = "Task action" },
     },
     opts = {
       dap = true,
+      template_dirs = { "overseer.template.user" },
       task_list = {
         direction = "bottom",
         min_height = 8,
