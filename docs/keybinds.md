@@ -60,6 +60,8 @@ Leader key: `<space>`. Modes: `n` normal, `i` insert, `v` visual, `x` visual-blo
 | `<leader>s.` | n | Grep in current file dir | snacks.picker |
 | `<leader>st` | n | Todo comments | plugins/editor.lua |
 | `<leader>sr` | n | Search / replace (grug-far) | grug-far.nvim |
+| `<leader>sR` | n | Grug-far: word under cursor | grug-far.nvim |
+| `<leader>sR` | x | Grug-far: visual selection | grug-far.nvim |
 | `gw` | n | Grep word under cursor | config/keymaps.lua |
 
 > Note: `<leader>sS` is bound by both Snacks (workspace symbols) and SSR (structural replace). Last-loaded plugin wins.
@@ -183,7 +185,6 @@ Leader key: `<space>`. Modes: `n` normal, `i` insert, `v` visual, `x` visual-blo
 |-----|------|-------------|--------|
 | `s` | n, x, o | Flash jump | flash.nvim |
 | `S` | n, x, o | Flash Treesitter | flash.nvim |
-| `w` / `e` / `b` / `ge` | n, o, x | Subword motions | spider |
 | `]]` / `[[` | n | Next/Prev reference | illuminate |
 | `]f` / `[f` | n, x, o | Next/Prev function | treesitter |
 | `]a` / `[a` | n, x, o | Next/Prev argument | treesitter |

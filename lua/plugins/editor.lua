@@ -84,6 +84,8 @@ return {
     cmd = "GrugFar",
     keys = {
       { "<leader>sr", function() require("grug-far").open() end, desc = "Search / replace (grug-far)" },
+      { "<leader>sR", function() require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } }) end, desc = "Grug-far: word under cursor" },
+      { "<leader>sR", function() require("grug-far").with_visual_selection() end, mode = "x", desc = "Grug-far: visual selection" },
     },
     config = true,
   },
@@ -177,19 +179,6 @@ return {
     },
     config = function()
       require("multicursor-nvim").setup()
-    end,
-  },
-
-  -- Subword motions (camelCase, snake_case aware)
-  {
-    "chrisgrieser/nvim-spider",
-    event = "VeryLazy",
-    config = function()
-      local spider = require("spider")
-      vim.keymap.set({ "n", "o", "x" }, "w", function() spider.motion("w") end, { desc = "Spider w" })
-      vim.keymap.set({ "n", "o", "x" }, "e", function() spider.motion("e") end, { desc = "Spider e" })
-      vim.keymap.set({ "n", "o", "x" }, "b", function() spider.motion("b") end, { desc = "Spider b" })
-      vim.keymap.set({ "n", "o", "x" }, "ge", function() spider.motion("ge") end, { desc = "Spider ge" })
     end,
   },
 

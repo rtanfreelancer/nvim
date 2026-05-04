@@ -248,6 +248,9 @@ return {
     dependencies = { "rafamadriz/friendly-snippets" },
     ---@type blink.cmp.Config
     opts = {
+      enabled = function()
+        return vim.bo.filetype ~= "grug-far"
+      end,
       keymap = {
         preset = "default",
         ["<C-Space>"] = { "show", "hide", "show_documentation", "hide_documentation" },
