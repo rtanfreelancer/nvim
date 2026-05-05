@@ -18,13 +18,17 @@ return {
         "ruby", "tsx", "typescript", "vim", "vimdoc", "yaml",
       })
 
+      -- Filetypes whose runtime indent/<ft>.{vim,lua} beats treesitter's indents.scm.
+      -- ruby/eruby: built-in GetRubyIndent handles continuations, hanging args,
+      -- method chains, when/elsif, hash rockets — treesitter's query is minimal.
+      local skip_ts_indent = { blade = true, ruby = true, eruby = true }
+
       -- Enable treesitter highlighting and indentation for buffers with an available parser
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
         callback = function(args)
           pcall(vim.treesitter.start, args.buf)
-          -- Enable treesitter-based indentation (skip blade — grammar has no indents.scm)
-          if vim.bo[args.buf].filetype ~= "blade"
+          if not skip_ts_indent[vim.bo[args.buf].filetype]
             and vim.treesitter.get_parser(args.buf, nil, { error = false }) then
             vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end

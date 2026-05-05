@@ -12,7 +12,8 @@ opt.signcolumn = "yes"
 opt.shiftwidth = 2
 opt.tabstop = 2
 opt.expandtab = true
-opt.smartindent = true
+-- smartindent is C-style; with indentexpr set it's ignored, and in Ruby it forces
+-- `#` comments to column 0. Rely on filetype indentexpr + autoindent instead.
 opt.autoindent = true
 opt.breakindent = true
 opt.splitbelow = true
