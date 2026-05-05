@@ -67,6 +67,98 @@ return {
       opts.formatters_by_ft = opts.formatters_by_ft or {}
       opts.formatters_by_ft.ruby = { "rubocop" }
       opts.formatters_by_ft.eruby = { "erb_format" }
+      opts.formatters_by_ft.haml = { "haml-lint" }
     end,
+  },
+
+  -- Projectionist: :A alternate, :Emodel/:Econtroller/:Eview/:Espec/:Ehelper/:Ejob/...
+  -- Heuristic below activates whenever both Gemfile and config/environment.rb exist
+  -- (i.e. a Rails project). other.nvim still handles richer many-target picks via
+  -- <leader>oo; projectionist owns the fast vim-rails-style :A and :E* commands.
+  {
+    "tpope/vim-projectionist",
+    event = { "BufReadPre", "BufNewFile" },
+    init = function()
+      vim.g.projectionist_heuristics = {
+        ["config/environment.rb&Gemfile"] = {
+          ["app/controllers/*_controller.rb"] = {
+            type = "controller",
+            alternate = "spec/controllers/{}_controller_spec.rb",
+            template = {
+              "class {camelcase|capitalize|colons}Controller < ApplicationController",
+              "end",
+            },
+          },
+          ["spec/controllers/*_controller_spec.rb"] = {
+            type = "spec",
+            alternate = "app/controllers/{}_controller.rb",
+          },
+          ["app/models/*.rb"] = {
+            type = "model",
+            alternate = "spec/models/{}_spec.rb",
+            template = {
+              "class {camelcase|capitalize|colons} < ApplicationRecord",
+              "end",
+            },
+          },
+          ["spec/models/*_spec.rb"] = {
+            type = "spec",
+            alternate = "app/models/{}.rb",
+          },
+          ["app/views/*"] = { type = "view" },
+          ["app/helpers/*_helper.rb"] = {
+            type = "helper",
+            alternate = "spec/helpers/{}_helper_spec.rb",
+          },
+          ["app/mailers/*.rb"] = {
+            type = "mailer",
+            alternate = "spec/mailers/{}_spec.rb",
+          },
+          ["app/jobs/*.rb"] = {
+            type = "job",
+            alternate = "spec/jobs/{}_spec.rb",
+          },
+          ["app/services/*.rb"] = {
+            type = "service",
+            alternate = "spec/services/{}_spec.rb",
+          },
+          ["app/policies/*_policy.rb"] = {
+            type = "policy",
+            alternate = "spec/policies/{}_policy_spec.rb",
+          },
+          ["app/serializers/*_serializer.rb"] = {
+            type = "serializer",
+            alternate = "spec/serializers/{}_serializer_spec.rb",
+          },
+          ["app/decorators/*_decorator.rb"] = {
+            type = "decorator",
+            alternate = "spec/decorators/{}_decorator_spec.rb",
+          },
+          ["app/forms/*_form.rb"] = {
+            type = "form",
+            alternate = "spec/forms/{}_form_spec.rb",
+          },
+          ["spec/factories/*.rb"]    = { type = "factory" },
+          ["db/migrate/*.rb"]        = { type = "migration" },
+          ["config/routes.rb"]       = { type = "routes" },
+          ["config/database.yml"]    = { type = "database" },
+          ["db/schema.rb"]           = { type = "schema" },
+          ["Gemfile"]                = { type = "gemfile" },
+          ["Rakefile"]               = { type = "rakefile" },
+        },
+      }
+    end,
+  },
+
+  -- Auto-insert `end` for `def`/`do`/`if`/`class`/`module`. Treesitter doesn't.
+  {
+    "tpope/vim-endwise",
+    ft = { "ruby", "eruby", "haml", "lua", "vim" },
+  },
+
+  -- HAML / Sass / SCSS syntax + indent (for Rails apps still on HAML views)
+  {
+    "tpope/vim-haml",
+    ft = { "haml", "sass", "scss" },
   },
 }

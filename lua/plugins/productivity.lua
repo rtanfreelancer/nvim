@@ -136,16 +136,116 @@ return {
     },
   },
 
-  -- Navigate code by AST: siblings, parent, child
+  -- Database client: connect/inspect/query Postgres/MySQL/SQLite from inside nvim.
+  -- vim-dadbod is the engine, dadbod-ui is the file-tree UI, dadbod-completion
+  -- gives column/table completion inside SQL buffers via blink.cmp/omnifunc.
+  --
+  -- Connections: drop URLs into ~/.local/share/db_ui/connections.json or set
+  -- vim.g.dbs = { rails_dev = "postgresql://..." } in a project-local config.
+  {
+    "tpope/vim-dadbod",
+    cmd = { "DB" },
+    dependencies = {
+      {
+        "kristijanhusak/vim-dadbod-ui",
+        cmd = { "DBUI", "DBUIToggle", "DBUIAddConnection", "DBUIFindBuffer" },
+        init = function()
+          vim.g.db_ui_use_nerd_fonts          = 1
+          vim.g.db_ui_show_database_icon      = 1
+          vim.g.db_ui_force_echo_notifications = 1
+          vim.g.db_ui_win_position            = "left"
+          vim.g.db_ui_winwidth                = 40
+          vim.g.db_ui_save_location           = vim.fn.stdpath("data") .. "/db_ui"
+          vim.g.db_ui_use_nvim_notify         = 1
+          -- Rails-aware: auto-load db/structure.sql + config/database.yml is read
+          -- by db_ui via :Rails detection (works without vim-rails too).
+          vim.g.db_ui_auto_execute_table_helpers = 1
+        end,
+      },
+      "kristijanhusak/vim-dadbod-completion",
+    },
+    keys = {
+      { "<leader>Du", "<cmd>DBUIToggle<cr>",         desc = "DB: toggle UI" },
+      { "<leader>Df", "<cmd>DBUIFindBuffer<cr>",     desc = "DB: find buffer" },
+      { "<leader>Da", "<cmd>DBUIAddConnection<cr>",  desc = "DB: add connection" },
+      { "<leader>Dr", "<cmd>DBUIRenameBuffer<cr>",   desc = "DB: rename buffer" },
+      { "<leader>Dq", "<cmd>DBUILastQueryInfo<cr>",  desc = "DB: last query info" },
+    },
+    config = function()
+      -- Wire dadbod-completion into SQL buffers. blink.cmp picks up omnifunc.
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "sql", "mysql", "plsql" },
+        callback = function()
+          vim.bo.omnifunc = "vim_dadbod_completion#omni"
+        end,
+      })
+    end,
+  },
+
+  -- REPL with line/visual/file send. For Ruby auto-picks bin/rails console
+  -- when in a Rails project, else pry, else irb. Same prefix (<leader>i)
+  -- works across ruby/python/lua scratch sessions.
+  {
+    "Vigemus/iron.nvim",
+    event = "VeryLazy",
+    config = function()
+      local iron = require("iron.core")
+      local view = require("iron.view")
+      iron.setup({
+        config = {
+          scratch_repl = true,
+          repl_definition = {
+            ruby = {
+              command = function()
+                if vim.fn.filereadable("bin/rails") == 1 then
+                  return { "bin/rails", "console" }
+                elseif vim.fn.executable("pry") == 1 then
+                  return { "pry" }
+                end
+                return { "irb" }
+              end,
+            },
+            python = { command = { "python3" } },
+            lua    = { command = { "lua" } },
+          },
+          repl_open_cmd = view.split.vertical.botright(0.4),
+        },
+        keymaps = {
+          toggle_repl       = "<leader>is",
+          restart_repl      = "<leader>ir",
+          send_motion       = "<leader>ic",
+          visual_send       = "<leader>iv",
+          send_line         = "<leader>il",
+          send_file         = "<leader>if",
+          send_until_cursor = "<leader>iu",
+          send_mark         = "<leader>im",
+          mark_motion       = "<leader>iM",
+          mark_visual       = "<leader>iM",
+          remove_mark       = "<leader>id",
+          cr                = "<leader>i<cr>",
+          interrupt         = "<leader>ix",
+          exit              = "<leader>iq",
+          clear             = "<leader>iC",
+        },
+        highlight = { italic = true },
+        ignore_blank_lines = true,
+      })
+    end,
+  },
+
+  -- Navigate code by AST: siblings, parent, child.
+  -- NOTE: <A-j>/<A-k> reserved for move-line (see config/keymaps.lua); using
+  -- <leader>n* prefix here to avoid clobbering that and Treewalker's own
+  -- defaults <C-h/j/k/l> (those collide with vim-tmux-navigator window nav).
   {
     "aaronik/treewalker.nvim",
     keys = {
-      { "<A-k>", "<cmd>Treewalker Up<cr>",         mode = { "n", "v" }, desc = "AST up" },
-      { "<A-j>", "<cmd>Treewalker Down<cr>",       mode = { "n", "v" }, desc = "AST down" },
-      { "<A-h>", "<cmd>Treewalker Left<cr>",       mode = { "n", "v" }, desc = "AST parent" },
-      { "<A-l>", "<cmd>Treewalker Right<cr>",      mode = { "n", "v" }, desc = "AST child" },
-      { "<A-S-k>", "<cmd>Treewalker SwapUp<cr>",   desc = "AST swap up" },
-      { "<A-S-j>", "<cmd>Treewalker SwapDown<cr>", desc = "AST swap down" },
+      { "<leader>nk", "<cmd>Treewalker Up<cr>",         mode = { "n", "v" }, desc = "AST up" },
+      { "<leader>nj", "<cmd>Treewalker Down<cr>",       mode = { "n", "v" }, desc = "AST down" },
+      { "<leader>nh", "<cmd>Treewalker Left<cr>",       mode = { "n", "v" }, desc = "AST parent" },
+      { "<leader>nl", "<cmd>Treewalker Right<cr>",      mode = { "n", "v" }, desc = "AST child" },
+      { "<leader>nK", "<cmd>Treewalker SwapUp<cr>",     desc = "AST swap up" },
+      { "<leader>nJ", "<cmd>Treewalker SwapDown<cr>",   desc = "AST swap down" },
     },
     opts = { highlight = true, highlight_duration = 250 },
   },
