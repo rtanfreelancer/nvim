@@ -58,6 +58,7 @@ return {
       -- it with the standard name + root_dir comparison.
       vim.lsp.config("ruby_lsp", {
         capabilities = capabilities,
+        cmd_env = { BUNDLE_QUIET = "1" },
         reuse_client = function(client, config)
           return client.name == config.name and client.root_dir == config.root_dir
         end,
@@ -139,7 +140,7 @@ return {
         pattern = { "*.rb", "*.erb" },
         callback = function(args)
           if next(vim.lsp.get_clients({ bufnr = args.buf })) then
-            vim.lsp.codelens.refresh({ bufnr = args.buf })
+            vim.lsp.codelens.enable(true, { bufnr = args.buf })
           end
         end,
       })
@@ -169,30 +170,6 @@ return {
     ft = "ruby",
     dependencies = { "mfussenegger/nvim-dap" },
     config = function() require("dap-ruby").setup() end,
-  },
-
-  -- Rails-aware rdbg helpers on top of nvim-dap-ruby:
-  --   :DebugRailsServer, :DebugSolidQueueWorker, :DebugMinitestFile, ...
-  -- Spawns rdbg with correct flags for each scenario.
-  {
-    "kaka-ruto/nvim-ruby-debugger",
-    ft = "ruby",
-    dependencies = { "mfussenegger/nvim-dap", "suketa/nvim-dap-ruby" },
-    cmd = {
-      "DebugRailsServer",
-      "DebugSolidQueueWorker",
-      "DebugMinitestFile",
-      "DebugRSpecFile",
-      "DebugCurrentFile",
-    },
-    keys = {
-      { "<leader>drs", "<cmd>DebugRailsServer<cr>",      desc = "Debug Rails server" },
-      { "<leader>drq", "<cmd>DebugSolidQueueWorker<cr>", desc = "Debug SolidQueue worker" },
-      { "<leader>drm", "<cmd>DebugMinitestFile<cr>",     desc = "Debug Minitest file" },
-      { "<leader>drr", "<cmd>DebugRSpecFile<cr>",        desc = "Debug RSpec file" },
-      { "<leader>drf", "<cmd>DebugCurrentFile<cr>",      desc = "Debug current file" },
-    },
-    config = function() require("ruby_debugger").setup() end,
   },
 
   -- SimpleCov gutter signs + summary buffer. Reads coverage/.resultset.json.
