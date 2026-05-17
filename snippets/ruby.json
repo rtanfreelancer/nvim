@@ -1019,6 +1019,277 @@
       "attach_file '${1:Label}', Rails.root.join('${2:spec/fixtures/file.png}')$0"
     ]
   },
+  "RSpec describe": {
+    "prefix": "desc",
+    "description": "RSpec.describe block",
+    "body": [
+      "RSpec.describe ${1:Subject}${2:, type: :${3:model}} do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec context": {
+    "prefix": "ctx",
+    "description": "context block",
+    "body": [
+      "context 'when ${1:condition}' do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec it do": {
+    "prefix": "itdo",
+    "description": "it block",
+    "body": [
+      "it '${1:does X}' do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec it oneline": {
+    "prefix": "itone",
+    "description": "one-line is_expected",
+    "body": ["it { is_expected.to ${1:eq ${2:value}} }$0"]
+  },
+  "RSpec before": {
+    "prefix": "bf",
+    "description": "before block",
+    "body": [
+      "before do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec before each": {
+    "prefix": "bfe",
+    "description": "before(:each) block",
+    "body": [
+      "before(:each) do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec before all": {
+    "prefix": "bfall",
+    "description": "before(:all) block",
+    "body": [
+      "before(:all) do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec after": {
+    "prefix": "af",
+    "description": "after block",
+    "body": [
+      "after do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec let": {
+    "prefix": "letv",
+    "description": "let block",
+    "body": ["let(:${1:name}) { ${2:value} }$0"]
+  },
+  "RSpec let bang": {
+    "prefix": "letbang",
+    "description": "let! block (eager)",
+    "body": ["let!(:${1:name}) { ${2:value} }$0"]
+  },
+  "RSpec subject": {
+    "prefix": "subj",
+    "description": "subject block",
+    "body": ["subject { ${1:described_class.new} }$0"]
+  },
+  "RSpec subject named": {
+    "prefix": "subjn",
+    "description": "named subject",
+    "body": ["subject(:${1:name}) { ${2:described_class.new} }$0"]
+  },
+  "RSpec described_class": {
+    "prefix": "dcls",
+    "description": "described_class",
+    "body": ["described_class$0"]
+  },
+  "Capybara have_title": {
+    "prefix": "havetitle",
+    "description": "expect have_title",
+    "body": ["expect(page).to have_title(${1:'text'})$0"]
+  },
+  "Capybara have_link": {
+    "prefix": "havelink",
+    "description": "expect have_link",
+    "body": ["expect(page).to have_link('${1:Label}'${2:, href: ${3:path}})$0"]
+  },
+  "Capybara have_button": {
+    "prefix": "havebutton",
+    "description": "expect have_button",
+    "body": ["expect(page).to have_button('${1:Label}')$0"]
+  },
+  "Capybara have_field": {
+    "prefix": "havefield",
+    "description": "expect have_field",
+    "body": ["expect(page).to have_field('${1:Label}'${2:, with: ${3:value}})$0"]
+  },
+  "Capybara have_select": {
+    "prefix": "haveselect",
+    "description": "expect have_select",
+    "body": ["expect(page).to have_select('${1:Label}'${2:, selected: '${3:Option}'})$0"]
+  },
+  "Capybara have_checked_field": {
+    "prefix": "havechecked",
+    "description": "expect have_checked_field",
+    "body": ["expect(page).to have_checked_field('${1:Label}')$0"]
+  },
+  "Capybara have_unchecked_field": {
+    "prefix": "haveunchecked",
+    "description": "expect have_unchecked_field",
+    "body": ["expect(page).to have_unchecked_field('${1:Label}')$0"]
+  },
+  "Capybara have_xpath": {
+    "prefix": "havexpath",
+    "description": "expect have_xpath",
+    "body": ["expect(page).to have_xpath('${1://xpath}')$0"]
+  },
+  "Capybara have_selector": {
+    "prefix": "haveselector",
+    "description": "expect have_selector",
+    "body": ["expect(page).to have_selector(${1::xpath}, '${2:selector}'${3:, text: '${4:t}'})$0"]
+  },
+  "Capybara have_table": {
+    "prefix": "havetable",
+    "description": "expect have_table",
+    "body": ["expect(page).to have_table('${1:id}'${2:, with_rows: ${3:rows}})$0"]
+  },
+  "Capybara not have_content": {
+    "prefix": "havenocontent",
+    "description": "expect have_no_content",
+    "body": ["expect(page).to have_no_content(${1:'text'})$0"]
+  },
+  "Capybara uncheck": {
+    "prefix": "uncheckbox",
+    "description": "uncheck checkbox",
+    "body": ["uncheck '${1:Label}'$0"]
+  },
+  "Capybara choose": {
+    "prefix": "choose",
+    "description": "choose radio",
+    "body": ["choose '${1:Label}'$0"]
+  },
+  "Capybara within_frame": {
+    "prefix": "withinframe",
+    "description": "within_frame block",
+    "body": [
+      "within_frame '${1:name}' do",
+      "\t$0",
+      "end"
+    ]
+  },
+  "RSpec request get": {
+    "prefix": "reqget",
+    "description": "request spec get",
+    "body": ["get ${1:path}${2:, params: ${3:{}}${4:, headers: ${5:headers}}$0"]
+  },
+  "RSpec request post": {
+    "prefix": "reqpost",
+    "description": "request spec post",
+    "body": ["post ${1:path}, params: ${2:{}}${3:, headers: ${4:headers}}$0"]
+  },
+  "RSpec request put": {
+    "prefix": "reqput",
+    "description": "request spec put",
+    "body": ["put ${1:path}, params: ${2:{}}$0"]
+  },
+  "RSpec request patch": {
+    "prefix": "reqpatch",
+    "description": "request spec patch",
+    "body": ["patch ${1:path}, params: ${2:{}}$0"]
+  },
+  "RSpec request delete": {
+    "prefix": "reqdelete",
+    "description": "request spec delete",
+    "body": ["delete ${1:path}$0"]
+  },
+  "RSpec expect eq": {
+    "prefix": "expeq",
+    "description": "expect to eq",
+    "body": ["expect(${1:actual}).to eq(${2:expected})$0"]
+  },
+  "RSpec expect eql": {
+    "prefix": "expeql",
+    "description": "expect to eql",
+    "body": ["expect(${1:actual}).to eql(${2:expected})$0"]
+  },
+  "RSpec expect be": {
+    "prefix": "expbe",
+    "description": "expect to be (identity)",
+    "body": ["expect(${1:actual}).to be(${2:expected})$0"]
+  },
+  "RSpec expect be_truthy": {
+    "prefix": "expbetruthy",
+    "description": "expect be_truthy",
+    "body": ["expect(${1:actual}).to be_truthy$0"]
+  },
+  "RSpec expect be_falsey": {
+    "prefix": "expbefalsey",
+    "description": "expect be_falsey",
+    "body": ["expect(${1:actual}).to be_falsey$0"]
+  },
+  "RSpec expect be_nil": {
+    "prefix": "expbenil",
+    "description": "expect be_nil",
+    "body": ["expect(${1:actual}).to be_nil$0"]
+  },
+  "RSpec expect include": {
+    "prefix": "expinclude",
+    "description": "expect to include",
+    "body": ["expect(${1:actual}).to include(${2:item})$0"]
+  },
+  "RSpec expect match": {
+    "prefix": "expmatch",
+    "description": "expect to match",
+    "body": ["expect(${1:actual}).to match(${2:/regex/})$0"]
+  },
+  "RSpec expect not_to": {
+    "prefix": "expnot",
+    "description": "expect not_to",
+    "body": ["expect(${1:actual}).not_to ${2:eq(${3:value})}$0"]
+  },
+  "RSpec expect kind_of": {
+    "prefix": "expkindof",
+    "description": "expect to be_a/kind_of",
+    "body": ["expect(${1:actual}).to be_a(${2:Klass})$0"]
+  },
+  "RSpec expect respond_to": {
+    "prefix": "exprespond",
+    "description": "expect to respond_to",
+    "body": ["expect(${1:actual}).to respond_to(:${2:method})$0"]
+  },
+  "RSpec allow receive": {
+    "prefix": "allowrcv",
+    "description": "allow receive",
+    "body": ["allow(${1:object}).to receive(:${2:method})$0"]
+  },
+  "RSpec expect receive": {
+    "prefix": "exprcv",
+    "description": "expect receive",
+    "body": ["expect(${1:object}).to receive(:${2:method})${3:.and_return(${4:value})}$0"]
+  },
+  "RSpec receive with": {
+    "prefix": "rcvwith",
+    "description": "receive with args and_return",
+    "body": [
+      "allow(${1:object}).to receive(:${2:method}).with(${3:args}).and_return(${4:value})$0"
+    ]
+  },
+  "RSpec receive and_raise": {
+    "prefix": "rcvraise",
+    "description": "receive and_raise",
+    "body": [
+      "allow(${1:object}).to receive(:${2:method}).and_raise(${3:StandardError})$0"
+    ]
+  },
   "Net::HTTP get": {
     "prefix": "nethttpget",
     "description": "Net::HTTP get JSON",

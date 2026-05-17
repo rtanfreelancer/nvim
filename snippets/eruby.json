@@ -28,14 +28,14 @@
     "body": [
       "<div class=\"field\">",
       "\t<%= f.label :${1:name} %>",
-      "\t<%= f.${2:text_field} :${1}${3:, class: 'form-control'} %>",
+      "\t<%= f.${2:text_field} :${1} %>",
       "</div>$0"
     ]
   },
   "Form submit": {
     "prefix": "fsubmit",
     "description": "form submit",
-    "body": ["<%= f.submit ${1:'Save'}${2:, class: 'btn btn-primary'} %>$0"]
+    "body": ["<%= f.submit ${1:'Save'} %>$0"]
   },
   "render partial": {
     "prefix": "renderpartial",
@@ -50,7 +50,7 @@
   "link_to path": {
     "prefix": "linkto",
     "description": "link_to text path",
-    "body": ["<%= link_to '${1:Label}', ${2:path}${3:, class: 'btn'} %>$0"]
+    "body": ["<%= link_to '${1:Label}', ${2:path} %>$0"]
   },
   "link_to method delete": {
     "prefix": "linkdelete",
@@ -67,7 +67,7 @@
   "image_tag": {
     "prefix": "imagetag",
     "description": "image_tag",
-    "body": ["<%= image_tag '${1:img.png}'${2:, class: ''} %>$0"]
+    "body": ["<%= image_tag '${1:img.png}' %>$0"]
   },
   "asset_path": {
     "prefix": "assetpath",
@@ -299,7 +299,7 @@
   "Form text_field": {
     "prefix": "ftext",
     "description": "f.text_field",
-    "body": ["<%= f.text_field :${1:attr}${2:, class: 'form-control'} %>$0"]
+    "body": ["<%= f.text_field :${1:attr} %>$0"]
   },
   "Form text_area": {
     "prefix": "ftextarea",
@@ -490,7 +490,7 @@
     "prefix": "linkblock",
     "description": "link_to block form",
     "body": [
-      "<%= link_to ${1:path}${2:, class: 'btn'} do %>",
+      "<%= link_to ${1:path} do %>",
       "\t$0",
       "<% end %>"
     ]

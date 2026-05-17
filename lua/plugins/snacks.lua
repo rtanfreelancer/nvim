@@ -6,7 +6,15 @@ return {
     ---@type snacks.Config
     opts = {
       image = { enabled = true },
-      picker = { enabled = true },
+      picker = {
+        enabled = true,
+        sources = {
+          projects = {
+            dev = { "~/freelancer-dev", "~/repo", "~/rails" },
+            patterns = { ".git", "Gemfile", "composer.json", "pyproject.toml", "requirements.txt", "Pipfile", "setup.py", "package.json" },
+          },
+        },
+      },
       lazygit = { enabled = true },
       terminal = { enabled = true },
       indent = { enabled = true, animate = { enabled = false } },
@@ -71,6 +79,7 @@ return {
     keys = {
       -- Find
       { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent files" },
+      { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
       { "<leader>,", function() Snacks.picker.buffers() end, desc = "Buffers" },
       -- Search
       { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer lines" },
