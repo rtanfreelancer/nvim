@@ -79,11 +79,10 @@ return {
         capabilities = capabilities,
         filetypes = { "php" },
         root_markers = { "composer.json", ".git" },
-        flags = { debounce_text_changes = 500 },
         settings = {
           intelephense = {
             files = {
-              maxSize = 1000000,
+              maxSize = 5000000,
               associations = { "*.php" },
               exclude = {
                 "**/vendor/**",
