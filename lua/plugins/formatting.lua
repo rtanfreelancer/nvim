@@ -1,11 +1,13 @@
 local in_freelancer = vim.fn.getcwd():find(vim.fn.expand("~/freelancer-dev"), 1, true) ~= nil
 
 return {
-  -- Formatting
+  -- Formatting (manual only — invoke via <leader>cf, see config/keymaps.lua)
   {
     "stevearc/conform.nvim",
-    event = "BufWritePre",
-    cmd = "ConformInfo",
+    cmd = { "ConformInfo" },
+    keys = {
+      { "<leader>cf", function() require("conform").format({ async = true }) end, mode = { "n", "v" }, desc = "Format file" },
+    },
     opts = {
       formatters_by_ft = {
         lua = { "stylua" },
@@ -29,10 +31,8 @@ return {
           stdin = false,
         },
       } or {},
-      format_on_save = function()
-        if vim.g.disable_autoformat then return end
-        return { timeout_ms = 3000, lsp_format = "fallback" }
-      end,
+      -- format_on_save removed: php_cs_fixer 5-40s stalls editor on save.
+      -- Use <leader>cf (async) or :Format to format current buffer manually.
     },
   },
 
@@ -52,22 +52,13 @@ return {
           "--standard=" .. vim.fn.expand("~/freelancer-dev/fl-gaf/phpcs_gaf.xml"),
           "-",
         }
-
-        local phpstan = lint.linters.phpstan
-        phpstan.cmd = "./vendor/bin/phpstan"
-        phpstan.args = {
-          "analyse",
-          "--no-progress",
-          "--error-format=json",
-          "--memory-limit=512M",
-          "--no-ansi",
-          "--no-interaction",
-          "--configuration=" .. vim.fn.expand("~/freelancer-dev/fl-gaf/phpstan.neon"),
-        }
       end
 
+      -- phpstan removed from on-save lint: --memory-limit=512M full-project analysis
+      -- on every BufWritePost stalled the editor. CI runs phpstan; trigger locally
+      -- via :Lint phpstan or `./vendor/bin/phpstan analyse` when needed.
       lint.linters_by_ft = in_freelancer and {
-        php = { "phpcs", "phpstan" },
+        php = { "phpcs" },
       } or {}
 
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {

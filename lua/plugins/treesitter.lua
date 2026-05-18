@@ -5,7 +5,7 @@ return {
     build = ":TSUpdate",
     config = function()
       require("nvim-treesitter").install({
-        "angular", "bash", "css", "eruby", "html", "javascript", "json", "lua",
+        "angular", "bash", "css", "embedded_template", "html", "javascript", "json", "lua",
         "markdown", "markdown_inline", "php", "php_only", "python", "regex",
         "ruby", "tsx", "typescript", "vim", "vimdoc", "yaml",
       })
@@ -19,10 +19,17 @@ return {
       -- method chains, when/elsif, hash rockets — treesitter's query is minimal.
       local skip_ts_indent = { ruby = true, eruby = true }
 
-      -- Enable treesitter highlighting and indentation for buffers with an available parser
+      -- Enable treesitter highlighting and indentation for buffers with an available parser.
+      -- Skip very large buffers (lines or bytes) to avoid slow parse on generated/minified files.
+      local TS_MAX_BYTES = 500 * 1024
+      local TS_MAX_LINES = 10000
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
         callback = function(args)
+          local name = vim.api.nvim_buf_get_name(args.buf)
+          local ok_stat, stat = pcall(vim.uv.fs_stat, name)
+          if ok_stat and stat and stat.size and stat.size > TS_MAX_BYTES then return end
+          if vim.api.nvim_buf_line_count(args.buf) > TS_MAX_LINES then return end
           pcall(vim.treesitter.start, args.buf)
           if not skip_ts_indent[vim.bo[args.buf].filetype]
             and vim.treesitter.get_parser(args.buf, nil, { error = false }) then

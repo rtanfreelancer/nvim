@@ -2034,5 +2034,294 @@
     "prefix": "tclassof",
     "description": "T.class_of(Klass)",
     "body": ["T.class_of(${1:Klass})$0"]
+  },
+  "after_action": {
+    "prefix": "aaction",
+    "description": "after_action filter",
+    "body": ["after_action :${1:method}${2:, only: %i[${3:show}]}$0"]
+  },
+  "around_action": {
+    "prefix": "araction",
+    "description": "around_action filter",
+    "body": ["around_action :${1:method}${2:, only: %i[${3:action}]}$0"]
+  },
+  "skip_before_action": {
+    "prefix": "skipba",
+    "description": "skip_before_action",
+    "body": [
+      "skip_before_action :${1:verify_authenticity_token}${2:, only: %i[${3:action}]}$0"
+    ]
+  },
+  "prepend_before_action": {
+    "prefix": "prepba",
+    "description": "prepend_before_action",
+    "body": ["prepend_before_action :${1:method}${2:, only: %i[${3:action}]}$0"]
+  },
+  "protect_from_forgery null_session": {
+    "prefix": "csrfnull",
+    "description": "protect_from_forgery null_session (API)",
+    "body": ["protect_from_forgery with: :null_session$0"]
+  },
+  "before_validation": {
+    "prefix": "beforevalid",
+    "description": "before_validation callback",
+    "body": ["before_validation :${1:method}${2:, on: :${3:create}}$0"]
+  },
+  "after_validation": {
+    "prefix": "aftervalid",
+    "description": "after_validation callback",
+    "body": ["after_validation :${1:method}$0"]
+  },
+  "before_save": {
+    "prefix": "beforesave",
+    "description": "before_save callback",
+    "body": ["before_save :${1:method}$0"]
+  },
+  "after_save": {
+    "prefix": "aftersave",
+    "description": "after_save callback",
+    "body": ["after_save :${1:method}$0"]
+  },
+  "before_create": {
+    "prefix": "beforecreate",
+    "description": "before_create callback",
+    "body": ["before_create :${1:method}$0"]
+  },
+  "after_create": {
+    "prefix": "aftercreate",
+    "description": "after_create callback",
+    "body": ["after_create :${1:method}$0"]
+  },
+  "before_update": {
+    "prefix": "beforeupdate",
+    "description": "before_update callback",
+    "body": ["before_update :${1:method}$0"]
+  },
+  "after_update": {
+    "prefix": "afterupdate",
+    "description": "after_update callback",
+    "body": ["after_update :${1:method}$0"]
+  },
+  "before_destroy": {
+    "prefix": "beforedestroy",
+    "description": "before_destroy callback",
+    "body": ["before_destroy :${1:method}$0"]
+  },
+  "after_destroy": {
+    "prefix": "afterdestroy",
+    "description": "after_destroy callback",
+    "body": ["after_destroy :${1:method}$0"]
+  },
+  "after_initialize": {
+    "prefix": "afterinit",
+    "description": "after_initialize callback",
+    "body": ["after_initialize :${1:method}$0"]
+  },
+  "after_find": {
+    "prefix": "afterfind",
+    "description": "after_find callback",
+    "body": ["after_find :${1:method}$0"]
+  },
+  "after_rollback": {
+    "prefix": "afterrollback",
+    "description": "after_rollback callback",
+    "body": ["after_rollback :${1:method}${2:, on: :${3:create}}$0"]
+  },
+  "after_touch": {
+    "prefix": "aftertouch",
+    "description": "after_touch callback",
+    "body": ["after_touch :${1:method}$0"]
+  },
+  "after_commit multi-event": {
+    "prefix": "aftercommitmulti",
+    "description": "after_commit on multi events",
+    "body": ["after_commit :${1:method}, on: %i[${2:create update}]$0"]
+  },
+  "has_many": {
+    "prefix": "hasmany",
+    "description": "has_many association",
+    "body": [
+      "has_many :${1:items}${2:, dependent: :${3:destroy}}${4:, inverse_of: :${5:parent}}$0"
+    ]
+  },
+  "has_one": {
+    "prefix": "hasone",
+    "description": "has_one association",
+    "body": ["has_one :${1:item}${2:, dependent: :${3:destroy}}$0"]
+  },
+  "belongs_to": {
+    "prefix": "belongsto",
+    "description": "belongs_to association",
+    "body": [
+      "belongs_to :${1:parent}${2:, optional: true}${3:, inverse_of: :${4:children}}$0"
+    ]
+  },
+  "accepts_nested_attributes_for": {
+    "prefix": "nestedattr",
+    "description": "accepts_nested_attributes_for",
+    "body": [
+      "accepts_nested_attributes_for :${1:assoc}${2:, allow_destroy: true, reject_if: :all_blank}$0"
+    ]
+  },
+  "default_scope": {
+    "prefix": "defscope",
+    "description": "default_scope lambda",
+    "body": ["default_scope -> { ${1:where(active: true)} }$0"]
+  },
+  "attr_accessor": {
+    "prefix": "attracc",
+    "description": "attr_accessor",
+    "body": ["attr_accessor :${1:name}$0"]
+  },
+  "attr_reader": {
+    "prefix": "attrrdr",
+    "description": "attr_reader",
+    "body": ["attr_reader :${1:name}$0"]
+  },
+  "attr_writer": {
+    "prefix": "attrwr",
+    "description": "attr_writer",
+    "body": ["attr_writer :${1:name}$0"]
+  },
+  "route get": {
+    "prefix": "rget",
+    "description": "GET route line",
+    "body": [
+      "get '${1:/path}', to: '${2:controller}#${3:action}'${4:, as: :${5:name}}$0"
+    ]
+  },
+  "route post": {
+    "prefix": "rpost",
+    "description": "POST route line",
+    "body": ["post '${1:/path}', to: '${2:controller}#${3:action}'$0"]
+  },
+  "route put": {
+    "prefix": "rput",
+    "description": "PUT route line",
+    "body": ["put '${1:/path}', to: '${2:controller}#${3:action}'$0"]
+  },
+  "route patch": {
+    "prefix": "rpatch",
+    "description": "PATCH route line",
+    "body": ["patch '${1:/path}', to: '${2:controller}#${3:action}'$0"]
+  },
+  "route delete": {
+    "prefix": "rdelete",
+    "description": "DELETE route line",
+    "body": ["delete '${1:/path}', to: '${2:controller}#${3:action}'$0"]
+  },
+  "route match": {
+    "prefix": "rmatch",
+    "description": "match route via verbs",
+    "body": [
+      "match '${1:/path}', to: '${2:controller}#${3:action}', via: %i[${4:get post}]$0"
+    ]
+  },
+  "route mount": {
+    "prefix": "rmount",
+    "description": "mount engine",
+    "body": ["mount ${1:Engine} => '${2:/path}'$0"]
+  },
+  "route concern": {
+    "prefix": "rconcern",
+    "description": "routing concern block",
+    "body": ["concern :${1:name} do", "\t$0", "end"]
+  },
+  "route direct": {
+    "prefix": "rdirect",
+    "description": "direct URL helper",
+    "body": ["direct :${1:name} do |${2:obj}|", "\t$0", "end"]
+  },
+  "route resolve": {
+    "prefix": "rresolve",
+    "description": "resolve model to helper",
+    "body": [
+      "resolve('${1:Model}') { |obj, opts| route_for(:${2:helper}, obj) }$0"
+    ]
+  },
+  "has_secure_password alias": {
+    "prefix": "securepass",
+    "description": "has_secure_password (alias of hsp)",
+    "body": ["has_secure_password$0"]
+  },
+  "described_class alias": {
+    "prefix": "describedclass",
+    "description": "described_class (alias of dcls)",
+    "body": ["described_class$0"]
+  },
+  "frozen_string_literal alias": {
+    "prefix": "frozenstring",
+    "description": "# frozen_string_literal magic comment (alias of magic)",
+    "body": ["# frozen_string_literal: true$0"]
+  },
+  "let alias": {
+    "prefix": "rlet",
+    "description": "let block (alias of letv)",
+    "body": ["let(:${1:name}) { ${2:value} }$0"]
+  },
+  "let! alias": {
+    "prefix": "rletbang",
+    "description": "let! eager (alias of letbang)",
+    "body": ["let!(:${1:name}) { ${2:value} }$0"]
+  },
+  "before alias": {
+    "prefix": "rspbefore",
+    "description": "RSpec before block (alias of bf)",
+    "body": ["before do", "\t$0", "end"]
+  },
+  "after alias": {
+    "prefix": "rspafter",
+    "description": "RSpec after block (alias of af)",
+    "body": ["after do", "\t$0", "end"]
+  },
+  "subject alias": {
+    "prefix": "rspsubject",
+    "description": "subject block (alias of subj)",
+    "body": ["subject { ${1:value} }$0"]
+  },
+  "context alias": {
+    "prefix": "rspcontext",
+    "description": "context block (alias of ctx)",
+    "body": ["context '${1:when X}' do", "\t$0", "end"]
+  },
+  "describe alias": {
+    "prefix": "rspdescribe",
+    "description": "RSpec.describe (alias of desc)",
+    "body": ["RSpec.describe ${1:Subject}${2:, type: :${3:model}} do", "\t$0", "end"]
+  },
+  "it alias": {
+    "prefix": "rspit",
+    "description": "it block (alias of itdo)",
+    "body": ["it '${1:does X}' do", "\t$0", "end"]
+  },
+  "debugger alias": {
+    "prefix": "debugger",
+    "description": "debugger (alias of dbg)",
+    "body": ["debugger$0"]
+  },
+  "binding.pry alias": {
+    "prefix": "bindingpry",
+    "description": "binding.pry (alias of pry)",
+    "body": ["binding.pry$0"]
+  },
+  "Benchmark alias": {
+    "prefix": "benchmark",
+    "description": "Benchmark.measure (alias of bench)",
+    "body": ["puts Benchmark.measure { ${1:code} }$0"]
+  },
+  "factory create alias": {
+    "prefix": "factorycreate",
+    "description": "FactoryBot.create (alias of fbcreate)",
+    "body": ["${1:var} = create(:${2:factory}${3:, ${4:attr}: ${5:value}})$0"]
+  },
+  "factory build alias": {
+    "prefix": "factorybuild",
+    "description": "FactoryBot.build (alias of fbbuild)",
+    "body": ["${1:var} = build(:${2:factory}${3:, ${4:attr}: ${5:value}})$0"]
+  },
+  "factory list alias": {
+    "prefix": "factorylist",
+    "description": "create_list (alias of fblist)",
+    "body": ["create_list(:${1:factory}, ${2:3}${3:, ${4:attr}: ${5:value}})$0"]
   }
 }

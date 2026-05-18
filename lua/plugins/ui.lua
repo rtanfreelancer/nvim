@@ -110,7 +110,7 @@ return {
     end,
   },
 
-  -- Indent scope animation
+  -- Indent scope (animation disabled — quadratic redraw per cursor move was a CPU sink)
   {
     "echasnovski/mini.indentscope",
     event = { "BufReadPre", "BufNewFile" },
@@ -119,11 +119,7 @@ return {
         symbol = "│",
         options = { try_as_border = true },
         draw = {
-          animation = require("mini.indentscope").gen_animation.quadratic({
-            easing = "out",
-            duration = 80,
-            unit = "total",
-          }),
+          animation = function() return 0 end,
         },
       }
     end,

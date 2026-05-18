@@ -59,6 +59,7 @@ return {
       vim.lsp.config("ruby_lsp", {
         capabilities = capabilities,
         cmd_env = { BUNDLE_QUIET = "1" },
+        flags = { debounce_text_changes = 500 },
         reuse_client = function(client, config)
           return client.name == config.name and client.root_dir == config.root_dir
         end,
@@ -71,7 +72,15 @@ return {
           -- "Schema" completion items with identical hover. Excluding
           -- schema.rb from the generic index drops the dup.
           indexing = {
-            excludedPatterns = { "**/db/schema.rb", "**/db/*_schema.rb" },
+            excludedPatterns = {
+              "**/db/schema.rb",
+              "**/db/*_schema.rb",
+              "**/coverage/**",
+              "**/node_modules/**",
+              "**/tmp/**",
+              "**/vendor/**",
+              "**/log/**",
+            },
           },
           addonSettings = {
             ["Ruby LSP Rails"] = {
@@ -133,15 +142,20 @@ return {
       end
 
       -- Auto-refresh codelens on Ruby buffers (LSP codelens not refreshed by default).
-      -- BufEnter dropped: fires every window/buffer switch and triggered an LSP
-      -- codeLens/refresh round-trip per switch. BufWritePost+InsertLeave cover
-      -- the cases where lens contents actually change.
-      vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
+      -- BufWritePost only (InsertLeave dropped — fired too often, flooded LSP with
+      -- codeLens/refresh requests that cascaded into cancel-loop on busy server).
+      -- Debounced so back-to-back saves coalesce.
+      local codelens_timer
+      vim.api.nvim_create_autocmd("BufWritePost", {
         pattern = { "*.rb", "*.erb" },
         callback = function(args)
-          if next(vim.lsp.get_clients({ bufnr = args.buf })) then
-            vim.lsp.codelens.enable(true, { bufnr = args.buf })
-          end
+          if codelens_timer then codelens_timer:stop() end
+          codelens_timer = vim.defer_fn(function()
+            if vim.api.nvim_buf_is_valid(args.buf)
+              and next(vim.lsp.get_clients({ bufnr = args.buf })) then
+              vim.lsp.codelens.enable(true, { bufnr = args.buf })
+            end
+          end, 1000)
         end,
       })
 

@@ -86,24 +86,6 @@ return {
   -- Consumed by jsonls/yamlls in lsp.lua
   { "b0o/SchemaStore.nvim", lazy = true, version = false },
 
-  -- Inline reference counts above symbols (JetBrains-style)
-  {
-    "Wansmer/symbol-usage.nvim",
-    event = "LspAttach",
-    opts = {
-      vt_position = "end_of_line",
-      references = { enabled = true, include_declaration = false },
-      definition = { enabled = false },
-      implementation = { enabled = false },
-      disable = {
-        -- Skip typescript-tools: textDocument/references on every symbol is expensive on large TS projects.
-        lsp = { "eslint", "typescript-tools" },
-        filetypes = {},
-        cond = { function(buf) return vim.api.nvim_buf_line_count(buf) > 1000 end },
-      },
-    },
-  },
-
   -- Break bad habits: blocks hjkl spam and arrow keys, nudges toward real motions
   {
     "m4xshen/hardtime.nvim",
