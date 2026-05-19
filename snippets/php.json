@@ -603,6 +603,11 @@
     "description": "@var mixed",
     "body": ["/** @var mixed \\$${1:name} */$0"]
   },
+  "GAF xdebug connect": {
+    "prefix": "xdc",
+    "description": "xdebug_connect_to_client() — for Thrift/consumer/script remote debugging",
+    "body": ["xdebug_connect_to_client();$0"]
+  },
   "GAF MethodNotAllowed": {
     "prefix": "fl-mna",
     "description": "MethodNotAllowedException guard",

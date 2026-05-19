@@ -115,6 +115,13 @@ if [[ "${NEOTEST_COVERAGE:-}" == "1" ]]; then
     PASSTHROUGH+=("--coverage-cobertura=coverage/cobertura.xml")
 fi
 
+# Debug opt-in: nvim's <leader>dD toggles GAF_DEBUG=1. bin/run-tests --debug
+# enables xdebug in the test container, which connects to the host listener
+# on :9003. Start the listener (<leader>dc) before running the test.
+if [[ "${GAF_DEBUG:-}" == "1" ]]; then
+    PASSTHROUGH+=("--debug")
+fi
+
 EXIT_CODE=0
 SETUP=false ./bin/run-tests "$TEST_PATH" "${PASSTHROUGH[@]}" || EXIT_CODE=$?
 

@@ -58,6 +58,19 @@ return {
       { "<leader>du", function() require("dap-view").toggle() end, desc = "Toggle DAP UI" },
       { "<leader>de", "<cmd>DapViewWatch<cr>", desc = "Watch expression", mode = { "n", "v" } },
       { "<leader>dl", function() require("dap").run_last() end, desc = "Run last" },
+      { "<leader>dx", "<cmd>GafXdebugStart<cr>",    desc = "GAF xdebug: start port-forward" },
+      { "<leader>dX", "<cmd>GafXdebugStop<cr>",     desc = "GAF xdebug: stop port-forward" },
+      { "<leader>dv", "<cmd>GafXdebugValidate<cr>", desc = "GAF xdebug: validate" },
+      { "<leader>dD", function()
+          vim.g.gaf_test_debug = not vim.g.gaf_test_debug
+          if vim.g.gaf_test_debug then
+            vim.env.GAF_DEBUG = "1"
+            vim.notify("GAF_DEBUG=1 (next neotest run will pass --debug)", vim.log.levels.INFO)
+          else
+            vim.env.GAF_DEBUG = nil
+            vim.notify("GAF_DEBUG cleared", vim.log.levels.INFO)
+          end
+        end, desc = "Toggle GAF test --debug flag" },
     },
     config = function()
       -- Breakpoint signs with explicit highlight groups
@@ -67,6 +80,31 @@ return {
       vim.fn.sign_define("DapBreakpointRejected",  { text = "", texthl = "DiagnosticError" })
       vim.fn.sign_define("DapLogPoint",            { text = "◆", texthl = "DiagnosticInfo" })
       vim.fn.sign_define("DapStopped",             { text = "▶", texthl = "DiagnosticOk", linehl = "DapStoppedLine" })
+
+      -- PHP / xdebug configurations (Freelancer GAF). Single listener config —
+      -- pathMappings are harmless for local runs (paths already match) and
+      -- required for remote (devbox /mnt/gaf → local checkout).
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "php",
+        once = true,
+        callback = function()
+          local dap = require("dap")
+          local fl_gaf = vim.fn.expand("~/freelancer-dev/fl-gaf")
+          dap.configurations.php = {
+            {
+              type = "php",
+              request = "launch",
+              name = "Listen for Xdebug (:9003)",
+              port = 9003,
+              log = false,
+              stopOnEntry = false,
+              pathMappings = {
+                ["/mnt/gaf"] = fl_gaf,
+              },
+            },
+          }
+        end,
+      })
     end,
   },
 }

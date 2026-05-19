@@ -21,6 +21,7 @@ A modular, LSP-first Neovim configuration built on [lazy.nvim](https://github.co
 - [Project-Specific Behavior](#project-specific-behavior)
 - [Snippets](#snippets)
 - [Multicursor](#multicursor)
+- [Debugging (PHP / xdebug + DAP)](#debugging-php--xdebug--dap)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -267,7 +268,7 @@ Parsers: `bash`, `css`, `eruby`, `html`, `javascript`, `json`, `lua`, `markdown`
 - `claude-code.nvim` — Claude Code terminal toggle (`<leader>ac`)
 
 ### Debugging — `dap.lua`
-`nvim-dap` + `nvim-dap-view` (modern tabbed panel — `<leader>du` toggle, `<leader>de` watch) + `nvim-dap-virtual-text` + `mason-nvim-dap` (auto-installs `debugpy`, `vscode-php-debug`).
+`nvim-dap` + `nvim-dap-view` (modern tabbed panel — `<leader>du` toggle, `<leader>de` watch) + `nvim-dap-virtual-text` + `mason-nvim-dap` (auto-installs `debugpy`, `vscode-php-debug`). GAF-specific xdebug helpers (`<leader>dx/dX/dv/dD`, `:GafXdebug*` user commands) wire `bin/gaf-xdebug` and the neotest wrapper — see [Debugging (PHP / xdebug + DAP)](#debugging-php--xdebug--dap).
 
 ### Git — `git.lua`
 `gitsigns.nvim` (gutter, blame, hunk ops, `]c`/`[c`), `git-conflict.nvim`, `diffview.nvim` (`<leader>gd`, `<leader>gf` history), `mini.diff` (inline overlay `<leader>go`, `ih` hunk textobj).
@@ -963,6 +964,142 @@ zzz = 3
 - **Treesitter incremental selection** uses `<CR>`/`<BS>`, not Tab — also no conflict.
 - which-key labels the `<leader>m` group as `multicursor` ([`editor.lua:320`](lua/plugins/editor.lua)).
 - The plugin is lazy-loaded via the `keys =` table, so no startup cost until first use.
+
+---
+
+## Debugging (PHP / xdebug + DAP)
+
+End-to-end debug workflow for the GAF PHP monorepo. The `vscode-php-debug` adapter is installed automatically by `mason-nvim-dap` and listens on port `9003` (xdebug 3 default).
+
+### Setup (one-time)
+
+1. **Install xdebug** locally (`pecl install xdebug`) — only required if you run PHP directly on the host. Container/devbox flows already ship it.
+2. **Configure your devbox name** — defaults to `rtanjaya`, hardcoded in [`lua/config/gaf-xdebug.lua`](lua/config/gaf-xdebug.lua). Change the function if your devbox slot is different.
+3. **Validate** — open a PHP file in `fl-gaf`, then `<leader>dv` (runs `bin/gaf-xdebug validate`). Fix anything it reports.
+
+### Keymaps
+
+| Key | Action |
+|---|---|
+| `<leader>db` | Toggle breakpoint |
+| `<leader>dB` | Conditional breakpoint |
+| `<leader>dc` | Continue / start listener (picks `Listen for Xdebug (:9003)`) |
+| `<leader>di` / `do` / `dO` | Step into / over / out |
+| `<leader>dt` | Terminate session |
+| `<leader>dl` | Run last config |
+| `<leader>du` | Toggle dap-view UI |
+| `<leader>de` | Watch expression (normal + visual) |
+| `<leader>dx` | `:GafXdebugStart` — start port-forward (`bin/gaf-xdebug start`) |
+| `<leader>dX` | `:GafXdebugStop` — stop port-forward |
+| `<leader>dv` | `:GafXdebugValidate` — IDE validation |
+| `<leader>dD` | Toggle `GAF_DEBUG=1` env (neotest then passes `--debug`) |
+
+User commands (defined in [`lua/config/gaf-xdebug.lua`](lua/config/gaf-xdebug.lua)):
+`:GafXdebugStart`, `:GafXdebugStop`, `:GafXdebugValidate`, `:GafXdebugLogs`, `:GafXdebugInsert` (inserts `xdebug_connect_to_client();` at cursor).
+
+### DAP configuration
+
+Registered once on first `FileType=php` event in [`lua/plugins/dap.lua`](lua/plugins/dap.lua):
+
+```lua
+dap.configurations.php = {
+  {
+    type = "php",
+    request = "launch",
+    name = "Listen for Xdebug (:9003)",
+    port = 9003,
+    pathMappings = { ["/mnt/gaf"] = "~/freelancer-dev/fl-gaf" },
+  },
+}
+```
+
+One config covers every workflow — `pathMappings` is harmless when paths already match (local runs) and required for remote (devbox `/mnt/gaf` → local checkout).
+
+### Workflows
+
+**1. HTTP request (remote devbox)**
+```
+<leader>dx          → port-forward up
+<leader>db          → breakpoint in handler
+<leader>dc          → start listener on :9003
+curl https://rtanjaya.syd1.fln-dev.net/... -H 'cookie: XDEBUG_SESSION=1'
+                    → breakpoint hits, dap-view opens
+<leader>dt          → done
+<leader>dX          → stop port-forward
+```
+
+Browser alternative: install [Xdebug Helper](https://github.com/JetBrains/xdebug-extension) extension, set to **Debug** mode, reload the page.
+
+**2. Thrift / Consumer / CLI script (remote)**
+
+Code must explicitly connect — xdebug doesn't auto-attach for non-HTTP entry points.
+
+```
+xdc<Tab>            → snippet inserts xdebug_connect_to_client();
+                      (or :GafXdebugInsert at cursor)
+fli service sync fl-gaf --skip-php-dependencies --skip-thrift
+<leader>dx          → port-forward up
+<leader>dc          → start listener
+# Trigger the consumer / Thrift call / re-run the script
+```
+
+For scripts run on the remote host, also `export PHP_IDE_CONFIG="serverName=rtanjaya"` before `sudo -E -u www-data php ...`.
+
+**3. Functional test (local Docker)**
+
+```
+<leader>Tx          → bin/run-tests setup  (once per session)
+<leader>db          → breakpoint in test OR code under test
+<leader>dD          → toggle GAF_DEBUG=1
+<leader>dc          → start listener on :9003
+<leader>tr          → run nearest test (wrapper auto-appends --debug)
+                      breakpoint hits, dap-view opens
+<leader>dD          → toggle GAF_DEBUG off when done (xdebug slows tests ~5x)
+```
+
+The wrapper [`scripts/neotest-run-tests.sh`](scripts/neotest-run-tests.sh) mirrors the coverage-flag pattern: `GAF_DEBUG=1` in the env → `--debug` appended to `bin/run-tests`.
+
+**4. Unit test (local)**
+
+```
+<leader>db          → breakpoint
+<leader>dc          → listener
+XDEBUG_MODE=debug bin/gaf-php vendor/bin/phpunit test/unit/src/...
+```
+
+Or via neotest with `<leader>dD` toggled — same flow as functional tests.
+
+**5. PHP script (local, dockerised)**
+
+```
+<leader>db          → breakpoint
+<leader>dc          → listener
+XDEBUG_MODE=debug bin/gaf-php scripts/playground.php
+```
+
+### Path mapping
+
+The hardcoded mapping is `/mnt/gaf` → `~/freelancer-dev/fl-gaf`. Update [`lua/plugins/dap.lua`](lua/plugins/dap.lua) if your checkout lives elsewhere. Multiple entries allowed — adapter resolves longest-prefix match.
+
+### Snippets
+
+| Trigger | Filetype | Expands to |
+|---|---|---|
+| `xdc` | `php` | `xdebug_connect_to_client();` (for Thrift/consumer/script) |
+
+### Troubleshooting (debug-specific)
+
+- **Breakpoint shows as "rejected"** — path mapping is wrong. `<leader>du` → breakpoints tab, check `verified` status. Confirm `/mnt/gaf` is the container mount target (always is for fl-gaf devboxes).
+- **Listener never connects** — check `xdebug.client_host`. In containers it should resolve to the host: `host.docker.internal` (macOS) or the host gateway IP (Linux). `bin/gaf-xdebug logs` (`:GafXdebugLogs`) shows xdebug's side.
+- **`:echo $GAF_DEBUG` is empty after toggle** — neotest spawns the wrapper as a child process; it inherits `vim.env`. If you toggled in a different nvim instance, the flag doesn't propagate.
+- **Tests run but no breakpoint hits** — listener may have disconnected. nvim-dap stops listening on each session end; press `<leader>dc` again (or `<leader>dl` for last config) before the next test run.
+- **Listener won't bind to `:9003`** — another instance still running. `:lua print(vim.inspect(require("dap").session()))` and `<leader>dt` to terminate. PHP-FPM uses `:9000` so won't collide with `:9003`.
+- **`bin/gaf-xdebug` not found** — `:GafXdebug*` commands walk up from the current buffer (then cwd) looking for `bin/gaf-xdebug`. Open any file inside `fl-gaf` (or `cd` into it) first.
+
+### Other languages
+
+- **Ruby (rdbg)** — `nvim-dap-ruby` adapter loads on `FileType=ruby` (see [`lua/plugins/ror.lua`](lua/plugins/ror.lua)). Start Rails with `RUBY_DEBUG_OPEN=true bin/rails s`, then `<leader>dc` attaches.
+- **Python (debugpy)** — auto-installed via mason. `<leader>dc` picks "Launch file" or attach. Neotest debugs via `<leader>td` (uses `strategy = "dap"`, `justMyCode=false`).
 
 ---
 
