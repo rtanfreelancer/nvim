@@ -186,16 +186,6 @@ return {
     config = function() require("dap-ruby").setup() end,
   },
 
-  -- SimpleCov gutter signs + summary buffer. Reads coverage/.resultset.json.
-  {
-    "andythigpen/nvim-coverage",
-    ft = { "ruby", "eruby" },
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = { "Coverage", "CoverageLoad", "CoverageShow", "CoverageHide", "CoverageToggle", "CoverageSummary" },
-    opts = { auto_reload = true },
-  },
-
-
   -- Ruby/ERB formatters
   {
     "stevearc/conform.nvim",

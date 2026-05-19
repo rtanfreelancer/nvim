@@ -106,6 +106,15 @@ if [[ -n "$ORIGINAL_JUNIT" ]]; then
     PASSTHROUGH+=("--log-junit=${LOCAL_JUNIT}")
 fi
 
+# Coverage opt-in: nvim's <leader>tc sets NEOTEST_COVERAGE=1. We inject the
+# cobertura flag here (rather than via neotest extra_args) because
+# neotest-phpunit's build_spec drops args.extra_args entirely. bin/gaf-php
+# auto-enables xdebug coverage mode whenever any --coverage-* flag is present.
+if [[ "${NEOTEST_COVERAGE:-}" == "1" ]]; then
+    mkdir -p "${PROJECT_ROOT}/coverage"
+    PASSTHROUGH+=("--coverage-cobertura=coverage/cobertura.xml")
+fi
+
 EXIT_CODE=0
 SETUP=false ./bin/run-tests "$TEST_PATH" "${PASSTHROUGH[@]}" || EXIT_CODE=$?
 
