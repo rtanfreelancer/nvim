@@ -304,6 +304,7 @@ return {
         { "<leader>m",  group = "multicursor" },
         { "<leader>n",  group = "ast nav" },
         { "<leader>o",  group = "overseer" },
+        { "<leader>O",  group = "obsidian" },
         { "<leader>r",  group = "rails" },
         { "<leader>S",  group = "snippets" },
         { "<leader>a",  group = "ai/claude" },
@@ -316,6 +317,47 @@ return {
       },
     },
   },
+  -- Obsidian vault integration (community-maintained fork; epwalsh's repo is abandoned).
+  -- ui.enable = false: checkmate.nvim owns checkbox rendering, prevents extmark collision.
+  {
+    "obsidian-nvim/obsidian.nvim",
+    version = "*",
+    ft = "markdown",
+    cmd = { "Obsidian" },
+    ---@module 'obsidian'
+    ---@type obsidian.config
+    opts = {
+      legacy_commands = false,
+      workspaces = {
+        { name = "personal", path = "~/Documents/Obsidian" },
+      },
+      ui = { enable = false },
+      completion = {
+        nvim_cmp = false,
+        blink = true,
+        min_chars = 2,
+      },
+      picker = { name = "snacks.pick" },
+    },
+    keys = {
+      { "<leader>On", "<cmd>Obsidian new<cr>",            desc = "New note" },
+      { "<leader>Oo", "<cmd>Obsidian open<cr>",           desc = "Open in Obsidian app" },
+      { "<leader>Os", "<cmd>Obsidian search<cr>",         desc = "Search vault" },
+      { "<leader>Of", "<cmd>Obsidian quick_switch<cr>",   desc = "Quick switch note" },
+      { "<leader>Ot", "<cmd>Obsidian today<cr>",          desc = "Today's daily note" },
+      { "<leader>Oy", "<cmd>Obsidian yesterday<cr>",      desc = "Yesterday's daily note" },
+      { "<leader>OT", "<cmd>Obsidian tomorrow<cr>",       desc = "Tomorrow's daily note" },
+      { "<leader>Ob", "<cmd>Obsidian backlinks<cr>",      desc = "Backlinks" },
+      { "<leader>Ol", "<cmd>Obsidian links<cr>",          desc = "Links in note" },
+      { "<leader>Og", "<cmd>Obsidian tags<cr>",           desc = "Tags" },
+      { "<leader>Or", "<cmd>Obsidian rename<cr>",         desc = "Rename note" },
+      { "<leader>OF", "<cmd>Obsidian follow_link<cr>",    desc = "Follow link" },
+      { "<leader>Op", "<cmd>Obsidian paste_img<cr>",      desc = "Paste image" },
+      { "<leader>OL", "<cmd>Obsidian link<cr>", mode = "v", desc = "Link selection" },
+      { "<leader>OW", "<cmd>Obsidian workspace<cr>",      desc = "Switch workspace" },
+    },
+  },
+
   {
     "bngarren/checkmate.nvim",
     ft = "markdown", -- activates on markdown files matching `files` patterns below
