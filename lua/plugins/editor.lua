@@ -302,9 +302,8 @@ return {
         { "<leader>d",  group = "debug" },
         { "<leader>h",  group = "harpoon" },
         { "<leader>m",  group = "multicursor" },
-        { "<leader>n",  group = "ast nav" },
+        { "<leader>n",  group = "obsidian" },
         { "<leader>o",  group = "overseer" },
-        { "<leader>O",  group = "obsidian" },
         { "<leader>r",  group = "rails" },
         { "<leader>S",  group = "snippets" },
         { "<leader>a",  group = "ai/claude" },
@@ -331,6 +330,28 @@ return {
       workspaces = {
         { name = "personal", path = "~/Documents/Obsidian" },
       },
+      notes_subdir = "inbox",
+      new_notes_location = "notes_subdir",
+      daily_notes = {
+        folder = "daily",
+        date_format = "%Y-%m-%d",
+        alias_format = "%B %-d, %Y",
+        default_tags = { "daily" },
+        template = "daily.md",
+      },
+      templates = {
+        folder = "templates",
+        date_format = "%Y-%m-%d",
+        time_format = "%H:%M",
+        substitutions = {
+          yesterday = function()
+            return os.date("%Y-%m-%d", os.time() - 86400)
+          end,
+          tomorrow = function()
+            return os.date("%Y-%m-%d", os.time() + 86400)
+          end,
+        },
+      },
       ui = { enable = false },
       completion = {
         nvim_cmp = false,
@@ -338,23 +359,56 @@ return {
         min_chars = 2,
       },
       picker = { name = "snacks.pick" },
+      wiki_link_func = "use_alias_only",
+      preferred_link_style = "wiki",
+      disable_frontmatter = false,
+      note_id_func = function(title)
+        if title ~= nil then
+          local slug = title:lower():gsub("[^%w%s%-_]", ""):gsub("%s+", "-"):gsub("%-+", "-")
+          return slug:gsub("^%-", ""):gsub("%-$", "")
+        end
+        return os.date("%Y%m%d%H%M%S")
+      end,
     },
     keys = {
-      { "<leader>On", "<cmd>Obsidian new<cr>",            desc = "New note" },
-      { "<leader>Oo", "<cmd>Obsidian open<cr>",           desc = "Open in Obsidian app" },
-      { "<leader>Os", "<cmd>Obsidian search<cr>",         desc = "Search vault" },
-      { "<leader>Of", "<cmd>Obsidian quick_switch<cr>",   desc = "Quick switch note" },
-      { "<leader>Ot", "<cmd>Obsidian today<cr>",          desc = "Today's daily note" },
-      { "<leader>Oy", "<cmd>Obsidian yesterday<cr>",      desc = "Yesterday's daily note" },
-      { "<leader>OT", "<cmd>Obsidian tomorrow<cr>",       desc = "Tomorrow's daily note" },
-      { "<leader>Ob", "<cmd>Obsidian backlinks<cr>",      desc = "Backlinks" },
-      { "<leader>Ol", "<cmd>Obsidian links<cr>",          desc = "Links in note" },
-      { "<leader>Og", "<cmd>Obsidian tags<cr>",           desc = "Tags" },
-      { "<leader>Or", "<cmd>Obsidian rename<cr>",         desc = "Rename note" },
-      { "<leader>OF", "<cmd>Obsidian follow_link<cr>",    desc = "Follow link" },
-      { "<leader>Op", "<cmd>Obsidian paste_img<cr>",      desc = "Paste image" },
-      { "<leader>OL", "<cmd>Obsidian link<cr>", mode = "v", desc = "Link selection" },
-      { "<leader>OW", "<cmd>Obsidian workspace<cr>",      desc = "Switch workspace" },
+      -- Navigation / search
+      { "<leader>nf", "<cmd>Obsidian quick_switch<cr>", desc = "Find note (quick switch)" },
+      { "<leader>ns", "<cmd>Obsidian search<cr>",       desc = "Search vault content" },
+      { "<leader>ng", "<cmd>Obsidian tags<cr>",         desc = "Tags picker" },
+      { "<leader>nb", "<cmd>Obsidian backlinks<cr>",    desc = "Backlinks" },
+      { "<leader>nl", "<cmd>Obsidian links<cr>",        desc = "Links in note" },
+      { "<leader>nF", "<cmd>Obsidian follow_link<cr>",  desc = "Follow link" },
+      { "<leader>no", "<cmd>Obsidian open<cr>",         desc = "Open in Obsidian app" },
+      { "<leader>nW", "<cmd>Obsidian workspace<cr>",    desc = "Switch workspace" },
+
+      -- Daily / review
+      { "<leader>nd", "<cmd>Obsidian today<cr>",       desc = "Today's daily" },
+      { "<leader>ny", "<cmd>Obsidian yesterday<cr>",   desc = "Yesterday's daily" },
+      { "<leader>nT", "<cmd>Obsidian tomorrow<cr>",    desc = "Tomorrow's daily" },
+      { "<leader>nR", function() require("util.obsidian").weekly_review() end, desc = "Weekly review" },
+
+      -- Capture (fast inbox dump)
+      { "<leader>nc", function() require("util.obsidian").capture("inbox") end, desc = "Capture to inbox" },
+      { "<leader>nn", "<cmd>Obsidian new<cr>", desc = "New note (raw, inbox)" },
+
+      -- From-template creators
+      { "<leader>np", function() require("util.obsidian").new_from_template({ folder = "projects", template = "project", prompt = "Project name: " }) end, desc = "New project" },
+      { "<leader>nm", function() require("util.obsidian").new_from_template({ folder = "meetings", template = "meeting", prompt = "Meeting title: ", date_prefix = true }) end, desc = "New meeting" },
+      { "<leader>nu", function() require("util.obsidian").new_from_template({ folder = "notes/bugs", template = "bug", prompt = "Bug symptom: " }) end, desc = "New bug" },
+      { "<leader>nD", function() require("util.obsidian").new_from_template({ folder = "notes/decisions", template = "decision", prompt = "Decision title: ", date_prefix = true }) end, desc = "New decision (ADR)" },
+      { "<leader>nk", function() require("util.obsidian").new_from_template({ folder = "notes/concepts", template = "concept", prompt = "Concept name: " }) end, desc = "New concept (knowledge)" },
+      { "<leader>nP", function() require("util.obsidian").new_from_template({ folder = "people", template = "person", prompt = "Person name: " }) end, desc = "New person" },
+      { "<leader>nS", function() require("util.obsidian").new_from_template({ folder = "snippets", template = "snippet", prompt = "Snippet title: " }) end, desc = "New snippet" },
+      { "<leader>nB", function() require("util.obsidian").new_from_template({ folder = "notes/books", template = "book", prompt = "Book title: " }) end, desc = "New book" },
+
+      -- Editing
+      { "<leader>ni", "<cmd>Obsidian template<cr>",     desc = "Insert template at cursor" },
+      { "<leader>nr", "<cmd>Obsidian rename<cr>",       desc = "Rename note (refactor links)" },
+      { "<leader>nI", "<cmd>Obsidian paste_img<cr>",    desc = "Paste image" },
+      { "<leader>nL", "<cmd>Obsidian link<cr>", mode = "v", desc = "Link selection" },
+      { "<leader>nX", "<cmd>Obsidian extract_note<cr>", mode = "v", desc = "Extract selection → note" },
+      { "<leader>nt", "<cmd>Obsidian toggle_checkbox<cr>", desc = "Toggle checkbox" },
+      { "<leader>nC", "<cmd>Obsidian toc<cr>",          desc = "Table of contents" },
     },
   },
 

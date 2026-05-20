@@ -137,23 +137,6 @@ return {
     end,
   },
 
-  -- Navigate code by AST: siblings, parent, child.
-  -- NOTE: <A-j>/<A-k> reserved for move-line (see config/keymaps.lua); using
-  -- <leader>n* prefix here to avoid clobbering that and Treewalker's own
-  -- defaults <C-h/j/k/l> (those collide with vim-tmux-navigator window nav).
-  {
-    "aaronik/treewalker.nvim",
-    keys = {
-      { "<leader>nk", "<cmd>Treewalker Up<cr>",         mode = { "n", "v" }, desc = "AST up" },
-      { "<leader>nj", "<cmd>Treewalker Down<cr>",       mode = { "n", "v" }, desc = "AST down" },
-      { "<leader>nh", "<cmd>Treewalker Left<cr>",       mode = { "n", "v" }, desc = "AST parent" },
-      { "<leader>nl", "<cmd>Treewalker Right<cr>",      mode = { "n", "v" }, desc = "AST child" },
-      { "<leader>nK", "<cmd>Treewalker SwapUp<cr>",     desc = "AST swap up" },
-      { "<leader>nJ", "<cmd>Treewalker SwapDown<cr>",   desc = "AST swap down" },
-    },
-    opts = { highlight = true, highlight_duration = 250 },
-  },
-
   -- Inline lens above functions (between phpDoc and function declaration).
   -- Only complexity + last_author — no LSP reference/blame storms.
   {
