@@ -10,12 +10,29 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
     opts = function()
-      local servers = { "eslint", "basedpyright", "ruff", "jsonls", "yamlls", "html", "cssls", "intelephense", "tailwindcss" }
+      local servers = { "eslint", "basedpyright", "ruff", "jsonls", "yamlls", "html", "cssls", "intelephense", "tailwindcss", "typos_lsp" }
       if vim.g.gaf then
         servers = require("gaf.lsp").filter_mason_servers(servers)
       end
       return { ensure_installed = servers }
     end,
+  },
+
+  -- Auto-install non-LSP tools (formatters, linters, DAP adapters not handled
+  -- by mason-lspconfig/mason-nvim-dap). Runs on startup; updates on demand.
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "mason-org/mason.nvim" },
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      ensure_installed = {
+        "stylua",
+        "prettierd",
+        "prettier",
+      },
+      auto_update = false,
+      run_on_start = true,
+    },
   },
 
   -- LSP config (needed for mason-lspconfig integration)
@@ -157,6 +174,14 @@ return {
       vim.lsp.config("cssls", {
         capabilities = capabilities,
         filetypes = { "css", "scss", "less" },
+      })
+
+      -- Typos LSP — fast spell/typo checker (Rust). Hint severity to stay quiet.
+      vim.lsp.config("typos_lsp", {
+        capabilities = capabilities,
+        init_options = {
+          diagnosticSeverity = "Hint",
+        },
       })
 
       -- mason-lspconfig 2.x `automatic_enable=true` (default) enables every

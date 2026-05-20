@@ -9,7 +9,7 @@ local function find_project_root(path, markers)
 end
 
 function M.run(file, ft)
-  local run_env, coverage_rel, markers
+  local run_env, coverage_rel, markers, extra_args
   if ft == "php" then
     coverage_rel = "coverage/cobertura.xml"
     run_env = { NEOTEST_COVERAGE = "1" }
@@ -18,6 +18,11 @@ function M.run(file, ft)
     coverage_rel = "coverage/.resultset.json"
     run_env = nil
     markers = { "Gemfile", "Rakefile", ".git" }
+  elseif ft == "typescript" or ft == "javascript" then
+    coverage_rel = "coverage/lcov.info"
+    run_env = nil
+    markers = { "package.json", ".git" }
+    extra_args = { "--coverage" }
   else
     vim.notify("Coverage not configured for filetype: " .. ft, vim.log.levels.WARN)
     return
@@ -33,7 +38,7 @@ function M.run(file, ft)
   if stat then prev_mtime = stat.mtime.sec end
 
   vim.notify("Running test with coverage...", vim.log.levels.INFO)
-  require("neotest").run.run({ file, env = run_env })
+  require("neotest").run.run({ file, env = run_env, extra_args = extra_args })
 
   local elapsed_ms = 0
   local interval_ms = 1000

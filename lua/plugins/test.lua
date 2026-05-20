@@ -16,13 +16,17 @@ return {
     keys = function()
       local keys = {
         { "<leader>tl", function() require("neotest").run.run_last() end, desc = "Run last test" },
-        { "<leader>tL", function() require("neotest").run.run_last({ strategy = "dap" }) end, desc = "Debug last test" },
+        { "<leader>tL", function()
+            require("dap") -- force-load so per-filetype dap.configurations are populated
+            require("neotest").run.run_last({ strategy = "dap" })
+        end, desc = "Debug last test" },
         { "<leader>tS", function() require("neotest").run.stop() end, desc = "Stop test" },
         { "<leader>to", function() require("neotest").output.open({ last_run = true, enter = true }) end, desc = "Show last output" },
         { "<leader>tO", function() require("neotest").output_panel.toggle() end, desc = "Toggle output panel" },
         { "<leader>ts", function() require("neotest").summary.toggle() end, desc = "Toggle summary" },
         { "<leader>tM", function() require("neotest").summary.run_marked() end, desc = "Run marked tests" },
         { "<leader>tC", function() require("config.neotest-coverage").run_last() end, desc = "Run last test with coverage" },
+        { "<leader>tP", function() require("config.profile").run_last() end, desc = "Profile last test" },
       }
       if vim.g.gaf then
         vim.list_extend(keys, require("gaf.test").global_keys())
@@ -102,7 +106,20 @@ return {
         vim.keymap.set("n", "<leader>tr", function() require("neotest").run.run() end, vim.tbl_extend("force", o, { desc = "Run nearest test" }))
         vim.keymap.set("n", "<leader>tf", function() require("neotest").run.run(vim.fn.expand("%")) end, vim.tbl_extend("force", o, { desc = "Run file tests" }))
         vim.keymap.set("n", "<leader>tc", function() require("config.neotest-coverage").run_current() end, vim.tbl_extend("force", o, { desc = "Run file tests with coverage" }))
-        vim.keymap.set("n", "<leader>td", function() require("neotest").run.run({ strategy = "dap" }) end, vim.tbl_extend("force", o, { desc = "Debug nearest test" }))
+        vim.keymap.set("n", "<leader>td", function()
+          require("dap") -- force-load so per-filetype dap.configurations are populated
+          require("neotest").run.run({ strategy = "dap" })
+        end, vim.tbl_extend("force", o, { desc = "Debug nearest test" }))
+        if ft == "ruby" then
+          vim.keymap.set("n", "<leader>tp", function() require("config.neotest-profile-ruby").run_current() end,
+            vim.tbl_extend("force", o, { desc = "Profile file tests (stackprof)" }))
+        elseif ft == "typescript" or ft == "javascript" then
+          local fname = vim.api.nvim_buf_get_name(buf)
+          if not fname:match("ui%-tests/src/.+%.spec%.ts$") then
+            vim.keymap.set("n", "<leader>tp", function() require("config.neotest-profile-ts").run_current() end,
+              vim.tbl_extend("force", o, { desc = "Profile file tests (cpu-prof)" }))
+          end
+        end
         if vim.g.gaf then require("gaf.test").attach_keys(buf, ft) end
       end
       vim.api.nvim_create_autocmd("FileType", {

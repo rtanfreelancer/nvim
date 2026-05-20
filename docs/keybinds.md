@@ -194,8 +194,10 @@ Leader: `<space>`. Local leader: `\`. Modes: `n` normal, `i` insert, `v` visual,
 
 | Key | Mode | Description |
 |-----|------|-------------|
-| `<leader>db` | n | Toggle breakpoint |
-| `<leader>dB` | n | Conditional breakpoint |
+| `<leader>db` | n | Toggle breakpoint (persistent across sessions) |
+| `<leader>dB` | n | Conditional breakpoint (prompts for expression in target language) |
+| `<leader>dC` | n | Clear all breakpoints |
+| `]b` / `[b` | n | Next / prev breakpoint |
 | `<leader>dc` | n | Continue |
 | `<leader>di` | n | Step into |
 | `<leader>do` | n | Step over |
@@ -204,6 +206,8 @@ Leader: `<space>`. Local leader: `\`. Modes: `n` normal, `i` insert, `v` visual,
 | `<leader>du` | n | Toggle DAP UI (nvim-dap-view) |
 | `<leader>de` | n, v | Watch expression |
 | `<leader>dl` | n | Run last |
+
+> Breakpoints persist via `persistent-breakpoints.nvim` — auto-load on `BufReadPost`. Must toggle via `<leader>db` (not raw `dap.toggle_breakpoint`) to save state.
 
 ### GAF profile (`GAF=1 nvim`)
 
