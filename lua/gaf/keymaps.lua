@@ -22,7 +22,4 @@ function M.open_phab_under_cursor()
   return false
 end
 
-function M.setup()
-end
-
 return M

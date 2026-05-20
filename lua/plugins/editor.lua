@@ -308,6 +308,7 @@ return {
         { "<leader>S",  group = "snippets" },
         { "<leader>a",  group = "ai/claude" },
         { "<leader>D",  group = "database" },
+        { "<leader>X",  group = "xdebug profile" },
         { "<leader>w",  group = "window" },
         { "g",          group = "goto" },
         { "gs",         group = "surround" },

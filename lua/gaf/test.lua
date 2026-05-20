@@ -3,8 +3,11 @@
 --   * scripts/neotest-run-tests.sh phpunit wrapper for Docker test infra
 --   * <leader>tx/tX setup/shutdown infra (PHP buffers)
 --   * <leader>tm/tw mobile/watch flags (UI-test buffers)
---   * <leader>tp/tP profile a test with xdebug profiling
+--   * <leader>tp/tP profile a test with xdebug profile mode (TIME)
 --   * <leader>dD toggle GAF_DEBUG env
+-- Memory profiling for local functional tests is NOT supported because
+-- bin/gaf-php only handles XDEBUG_MODE=debug|profile|coverage (no trace branch).
+-- For memory: profile HTTP endpoints against devbox via <leader>Xm instead.
 
 local M = {}
 
@@ -26,7 +29,7 @@ function M.attach_keys(buf, filetype)
   if filetype == "php" then
     local o = { buffer = buf, silent = true }
     vim.keymap.set("n", "<leader>tp", function() require("gaf.neotest-profile").run_current() end,
-      vim.tbl_extend("force", o, { desc = "Profile file tests (xdebug)" }))
+      vim.tbl_extend("force", o, { desc = "Profile file tests TIME (xdebug profile)" }))
     vim.keymap.set("n", "<leader>tx", infra.setup_infra,
       vim.tbl_extend("force", o, { desc = "Setup test infra" }))
     vim.keymap.set("n", "<leader>tX", infra.shutdown_infra,
